@@ -1,11 +1,5 @@
 package com.company;
 
-import javafx.stage.Screen;
-
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
 
 public class Main {
 
@@ -17,5 +11,9 @@ public class Main {
 
         ScreenshotGenerator screenshotGenerator = new ScreenshotGenerator(inputDirectoryName, outputDirectoryName, templateNamePath);
         screenshotGenerator.execute();
+
+        YoutubeSearch youtubeSearch = new YoutubeSearch("AIzaSyDrTVLJKtzt9Sm0pba75XmL0u4F1n7zGgg");
+        youtubeSearch.searchVideo("far+cry+3+game+trailer");
+        System.out.println(youtubeSearch.getFirstResultID());
     }
 }

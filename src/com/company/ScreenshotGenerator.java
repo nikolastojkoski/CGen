@@ -1,6 +1,5 @@
 package com.company;
 
-import javafx.stage.Screen;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -47,7 +46,6 @@ public class ScreenshotGenerator
                 /** Save */
                 makeDirectory(outputDirectoryName);
                 saveImage(img, outputDirectoryName + "/" + fileName.substring(0, fileName.indexOf(".")) + "_screenshot.jpg");
-
             }
 
         }
@@ -78,5 +76,4 @@ public class ScreenshotGenerator
         }
         return false;
     }
-
 }

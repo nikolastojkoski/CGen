@@ -8,33 +8,17 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="module-library">
+    <orderEntry type="module-library" exported="">
       <library>
         <CLASSES>
-          <root url="jar://$USER_HOME$/Desktop/content generator/CGen/processing-core.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
-      <library>
-        <CLASSES>
-          <root url="file://$USER_HOME$/Desktop/content generator/processing-3.0.2" />
+          <root url="jar://$USER_HOME$/Desktop/content generator/json/java-json.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="file://$USER_HOME$/Desktop/content generator/processing-3.0.2/modes/java/generated" />
-          <root url="file://$USER_HOME$/Desktop/content generator/processing-3.0.2/modes/java/libraries/dxf/src" />
-          <root url="file://$USER_HOME$/Desktop/content generator/processing-3.0.2/modes/java/libraries/io/src" />
-          <root url="file://$USER_HOME$/Desktop/content generator/processing-3.0.2/modes/java/libraries/net/src" />
-          <root url="file://$USER_HOME$/Desktop/content generator/processing-3.0.2/modes/java/libraries/pdf/src" />
-          <root url="file://$USER_HOME$/Desktop/content generator/processing-3.0.2/modes/java/libraries/serial/src" />
-          <root url="file://$USER_HOME$/Desktop/content generator/processing-3.0.2/modes/java/libraries/svg/src" />
-          <root url="file://$USER_HOME$/Desktop/content generator/processing-3.0.2/modes/java/src" />
-          <root url="file://$USER_HOME$/Desktop/content generator/processing-3.0.2/tools/MovieMaker/src" />
+          <root url="jar://$USER_HOME$/Desktop/content generator/json/java-json.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>
+    <orderEntry type="library" name="java-json" level="project" />
   </component>
 </module>

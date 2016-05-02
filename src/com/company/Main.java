@@ -9,18 +9,40 @@ public class Main {
 
     public static void main(String[] args)
     {
-        String directoryName = "Test_output";
+
+        String inputDirectoryName = "input_pictures";
+        String outputDirectoryName = "output_screenshots";
         String templateNamePath = "resources/MainTemplate.jpg";
-        String topImageNamePath = "resources/TestPNG.png";
 
-        ImageBlender blender = new ImageBlender(templateNamePath, topImageNamePath);
-        blender.execute();
-        BufferedImage img = blender.getImage();
 
-        makeDirectory(directoryName);
-        saveImage(img, directoryName + "/screenshot.jpg");
+        File cDir = new File(inputDirectoryName);
+        File[] listOfFiles = cDir.listFiles();
+
+        int conversionProgress = 0;
+
+        for(File cFile : listOfFiles)
+        {
+            if(cFile.isFile() && isImage(cFile))
+            {
+                System.out.println(++conversionProgress + "/" + listOfFiles.length);
+
+                String topImageNamePath = inputDirectoryName + "/" + cFile.getName();
+                String fileName = cFile.getName();
+
+                /** Convert */
+                ImageBlender blender = new ImageBlender(templateNamePath, topImageNamePath); //Add blendposition, resize
+                blender.execute();
+                BufferedImage img = blender.getImage();
+
+                /** Save */
+                makeDirectory(outputDirectoryName);
+                saveImage(img, outputDirectoryName + "/" + fileName.substring(0, fileName.indexOf(".")) + "_screenshot.jpg");
+
+            }
+        }
 
     }
+
     public static void saveImage(BufferedImage img, String namepath)
     {
         try {
@@ -33,5 +55,16 @@ public class Main {
     {
         File dir = new File(directoryName);
         dir.mkdir();
+    }
+    public static boolean isImage(File cFile)
+    {
+        String fileName = cFile.getName().toLowerCase();
+        String[] allowed = {".jpg", ".jpeg", ".png"};
+        for(String type: allowed)
+        {
+            if(fileName.endsWith(type))
+                return true;
+        }
+        return false;
     }
 }

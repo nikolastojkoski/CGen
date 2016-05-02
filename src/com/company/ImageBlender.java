@@ -18,14 +18,26 @@ public class ImageBlender
     private BufferedImage bottom;
     private BufferedImage top;
     private BufferedImage blended;
+    private int resizeX = 640;
+    private int resizeY = 360;
+    private int blendPositionX = 198;
+    private int blendPositionY = 25;
 
     public ImageBlender(String botLocation, String topLocation)
     {
         this.botLocation = botLocation;
         this.topLocation = topLocation;
-
     }
-
+    public void setResize(int x, int y)
+    {
+        resizeX = x;
+        resizeY = y;
+    }
+    public void setBlendPosition(int x, int y)
+    {
+        blendPositionX = x;
+        blendPositionY = y;
+    }
     public BufferedImage getImage()
     {
         return blended;
@@ -34,12 +46,12 @@ public class ImageBlender
     public void execute()
     {
         loadImages();
-        top = resize(top, 640, 360);
+        top = resize(top, resizeX, resizeY);
 
         blended = new BufferedImage(bottom.getWidth(), bottom.getHeight(),BufferedImage.TYPE_3BYTE_BGR);
         Graphics g = blended.getGraphics();
         g.drawImage(bottom,0,0,null);
-        g.drawImage(top, 198, 25,null);
+        g.drawImage(top, blendPositionX, blendPositionY, null);
     }
 
     private BufferedImage resize(BufferedImage img, int newW, int newH)
@@ -60,7 +72,7 @@ public class ImageBlender
             bottom = ImageIO.read(new File(botLocation));
             top = ImageIO.read(new File(topLocation));
 
-            if(topLocation.toLowerCase().contains(".png"))
+            if(topLocation.toLowerCase().endsWith(".png"))
             {
                 top = convert_PNG_to_JPG(top);
             }

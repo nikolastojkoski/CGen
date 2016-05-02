@@ -1,12 +1,9 @@
 package com.company;
 
 import java.awt.*;
-import java.awt.event.*;
 import java.awt.image.*;
 import java.io.*;
-import java.nio.Buffer;
 import javax.imageio.*;
-import javax.swing.*;
 
 /**
  * Created by Nikola on 4/27/2016.

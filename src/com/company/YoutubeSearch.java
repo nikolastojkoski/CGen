@@ -3,12 +3,6 @@ package com.company;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import javax.net.ssl.HttpsURLConnection;
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.URL;
-
 /**
  * Created by Nikola on 5/2/2016.
  */
@@ -37,37 +31,11 @@ public class YoutubeSearch {
 
     private String getJSONString()
     {
-
-        HttpsURLConnection httpsURLConnection;
         String queryAddress = base + query + "&key=" + api_key;
-        BufferedReader reader;
-        InputStream inputStream;
-        String jsonString = "";
 
-        try {
-            URL url = new URL(queryAddress);
-            httpsURLConnection = (HttpsURLConnection) url.openConnection();
-            httpsURLConnection.setRequestMethod("GET");
-            httpsURLConnection.connect();
-
-            inputStream = httpsURLConnection.getInputStream();
-            reader = new BufferedReader(new InputStreamReader(inputStream));
-
-            while(true)
-            {
-                String line = reader.readLine();
-                if(line != null)
-                    jsonString += line;
-                else
-                    break;
-            }
-
-            httpsURLConnection.disconnect();
-            reader.close();
-
-        }catch(Exception e){e.printStackTrace();}
-
-        return jsonString;
+        ApiConnection apiConnection = new ApiConnection();
+        apiConnection.setQuery(queryAddress);
+        return apiConnection.getResponse();
     }
     private String extractID(String jsonString)
     {

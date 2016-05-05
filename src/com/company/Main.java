@@ -1,6 +1,11 @@
 package com.company;
 
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+
 public class Main {
 
     public static void main(String[] args)
@@ -18,6 +23,13 @@ public class Main {
 
         BitlyShortener bitlyShortener = new BitlyShortener("ravenmind", "R_149d89614d124e9d9dd58606f26cb296");
         System.out.println(bitlyShortener.getShortUrl("http://gamedownloads2016.com"));
+
+        try {
+            BufferedImage image =  ImageIO.read(new File("resources/TestPic.jpg"));
+            ImageCompressor imageCompressor = new ImageCompressor();
+            imageCompressor.compressImage(image, 100000);
+            imageCompressor.saveImage("test_output", "compressedImage");
+        } catch (IOException e) { e.printStackTrace();}
 
     }
 }

@@ -50,7 +50,6 @@ public class ScreenshotGenerator
         }
 
     }
-
     private void saveImage(BufferedImage img, String namepath)
     {
         try {

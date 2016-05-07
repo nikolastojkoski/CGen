@@ -1,11 +1,5 @@
 package com.company;
 
-
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-
 public class Main {
 
     public static void main(String[] args)
@@ -30,8 +24,7 @@ public class Main {
         imageCompressor.saveImage("test_output", "compressedImage");
 
         ImgurUploader imgurUploader = new ImgurUploader("cb98c2f98ad76fa");
-        File imageFile = new File("resources/TestPic.jpg");
-        imgurUploader.upload(imageFile);
+        imgurUploader.upload("resources/TestPic.jpg");
         System.out.println(imgurUploader.getImageLink());
 
     }

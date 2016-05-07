@@ -7,7 +7,6 @@ import javax.imageio.ImageIO;
 import javax.net.ssl.HttpsURLConnection;
 import java.awt.image.BufferedImage;
 import java.io.*;
-import java.lang.reflect.Executable;
 import java.net.URL;
 import java.net.URLEncoder;
 
@@ -26,9 +25,9 @@ public class ImgurUploader {
     {
         this.clientID = clientID;
     }
-    public void upload(File file)
+    public void upload(String namepath)
     {
-        this.imageFile = file;
+        this.imageFile = new File(namepath);
         getDataString();
         execute();
     }
@@ -87,16 +86,5 @@ public class ImgurUploader {
         }catch(Exception e){e.printStackTrace();}
 
     }
-
-
-
-
-
-
-
-
-
-
-
 
 }

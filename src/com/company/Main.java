@@ -10,6 +10,7 @@ public class Main {
 
     public static void main(String[] args)
     {
+
         String inputDirectoryName = "input_pictures";
         String outputDirectoryName = "output_screenshots";
         String templateNamePath = "resources/MainTemplate.jpg";
@@ -24,12 +25,14 @@ public class Main {
         BitlyShortener bitlyShortener = new BitlyShortener("ravenmind", "R_149d89614d124e9d9dd58606f26cb296");
         System.out.println(bitlyShortener.getShortUrl("http://gamedownloads2016.com"));
 
-        try {
-            BufferedImage image =  ImageIO.read(new File("resources/TestPic.jpg"));
-            ImageCompressor imageCompressor = new ImageCompressor();
-            imageCompressor.compressImage(image, 100000);
-            imageCompressor.saveImage("test_output", "compressedImage");
-        } catch (IOException e) { e.printStackTrace();}
+        ImageCompressor imageCompressor = new ImageCompressor();
+        imageCompressor.compressImage("resources/TestPic.jpg", 100000);
+        imageCompressor.saveImage("test_output", "compressedImage");
+
+        ImgurUploader imgurUploader = new ImgurUploader("cb98c2f98ad76fa");
+        File imageFile = new File("resources/TestPic.jpg");
+        imgurUploader.upload(imageFile);
+        System.out.println(imgurUploader.getImageLink());
 
     }
 }

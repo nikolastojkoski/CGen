@@ -27,6 +27,13 @@ public class ImageCompressor {
         this.targetSize = targetSize;
         calculateParams();
     }
+    public void compressImage(String namepath, int targetSize)
+    {
+        try {
+            this.image = ImageIO.read(new File(namepath));
+            this.targetSize = targetSize;
+        }catch(Exception e){e.printStackTrace();}
+    }
 
     public void saveImage(String outputDir, String filename)
     {

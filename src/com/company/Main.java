@@ -30,10 +30,9 @@ public class Main {
         GoogleSearch googleSearch = new GoogleSearch();
         googleSearch.search("Need+for+speed+2015+site:wikipedia.org");
         System.out.println(googleSearch.getFirstResultLink());
-        System.out.println(googleSearch.getFirstResultTitle());
 
         WikipediaFetcher wikipediaFetcher = new WikipediaFetcher();
-        System.out.println(wikipediaFetcher.getSummary("Need_for_Speed_(2015_video_game)"));
+        System.out.println(wikipediaFetcher.getSummary("https://en.wikipedia.org/wiki/Need_for_Speed_(2015_video_game)"));
 
     }
 }

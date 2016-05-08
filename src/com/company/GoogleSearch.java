@@ -15,7 +15,6 @@ public class GoogleSearch {
 
     private String base = "https://www.google.com/search?q=";
     private String firstResultLink;
-    private String firstResultTitle;
     private String query;
 
     public GoogleSearch(){}
@@ -28,11 +27,6 @@ public class GoogleSearch {
     {
         return firstResultLink;
     }
-    public String getFirstResultTitle()
-    {
-        return firstResultTitle;
-    }
-
     private void execute()
     {
         String request = base + query + "&num=1";
@@ -49,7 +43,6 @@ public class GoogleSearch {
                 if(temp.startsWith("/url?q="))
                 {
                     firstResultLink = temp.substring(7, temp.indexOf("&"));
-                    firstResultTitle = firstResultLink.substring(firstResultLink.indexOf("wiki/") + 5);
                     break;
                 }
 

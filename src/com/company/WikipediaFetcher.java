@@ -13,9 +13,9 @@ public class WikipediaFetcher {
     private String finalSummary;
 
     public WikipediaFetcher(){};
-    public String getSummary(String title)
+    public String getSummary(String link)
     {
-        this.title = title;
+        this.title = link.substring(link.indexOf("wiki/") + 5);
         finalSummary = extractSummary(getJsonResponse());
         addPCVersion();
         return finalSummary;

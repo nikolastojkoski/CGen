@@ -43,14 +43,14 @@ public class WikipediaFetcher {
     {
         String temp = finalSummary.toLowerCase();
 
-        String[] variations = {"pc","windows"};
+        String[] variations = {" pc","windows"};
         for(String variation : variations)
             if(temp.contains(variation))
                 return;
 
         int lowestIndex = temp.length();
         boolean found = false;
-        String[] consoleVariations = {"playstation", "xbox", "nintendo", " wii "};
+        String[] consoleVariations = {"playstation", "xbox", "nintendo", " wii"};
         for(String variation: consoleVariations)
         {
             int index = temp.indexOf(variation);

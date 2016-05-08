@@ -27,5 +27,13 @@ public class Main {
         imgurUploader.upload("resources/TestPic.jpg");
         System.out.println(imgurUploader.getImageLink());
 
+        GoogleSearch googleSearch = new GoogleSearch();
+        googleSearch.search("Need+for+speed+2015+site:wikipedia.org");
+        System.out.println(googleSearch.getFirstResultLink());
+        System.out.println(googleSearch.getFirstResultTitle());
+
+        WikipediaFetcher wikipediaFetcher = new WikipediaFetcher();
+        System.out.println(wikipediaFetcher.getSummary("Need_for_Speed_(2015_video_game)"));
+
     }
 }

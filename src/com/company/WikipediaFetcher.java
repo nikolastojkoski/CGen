@@ -13,11 +13,14 @@ public class WikipediaFetcher {
     private String finalSummary;
 
     public WikipediaFetcher(){};
-    public String getSummary(String link)
+    public void fetchSummary(String link)
     {
         this.title = link.substring(link.indexOf("wiki/") + 5);
         finalSummary = extractSummary(getJsonResponse());
         addPCVersion();
+    }
+    public String getSummary()
+    {
         return finalSummary;
     }
 

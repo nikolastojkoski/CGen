@@ -32,7 +32,15 @@ public class Main {
         System.out.println(googleSearch.getFirstResultLink());
 
         WikipediaFetcher wikipediaFetcher = new WikipediaFetcher();
-        System.out.println(wikipediaFetcher.getSummary("https://en.wikipedia.org/wiki/Need_for_Speed_(2015_video_game)"));
+        wikipediaFetcher.fetchSummary("https://en.wikipedia.org/wiki/Need_for_Speed_(2015_video_game)");
+        System.out.println(wikipediaFetcher.getSummary());
 
+        HtmlGenerator htmlGenerator = new HtmlGenerator();
+        htmlGenerator.setDownloadLink("https://google.com");
+        htmlGenerator.setImageLink(imgurUploader.getImageLink());
+        htmlGenerator.setYoutubeID(youtubeSearch.getFirstResultID());
+        htmlGenerator.setWikipediaSummary(wikipediaFetcher.getSummary());
+        htmlGenerator.generate();
+        System.out.print(htmlGenerator.getHtml());
     }
 }

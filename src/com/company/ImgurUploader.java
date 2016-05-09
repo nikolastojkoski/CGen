@@ -20,6 +20,7 @@ public class ImgurUploader {
     private String base = "https://api.imgur.com/3/image";
     private String data;
     private String response;
+    private String link;
 
     public ImgurUploader(String clientID)
     {
@@ -30,16 +31,18 @@ public class ImgurUploader {
         this.imageFile = new File(namepath);
         getDataString();
         execute();
+        extractLink();
     }
     public String getImageLink()
     {
-        String link = "";
+        return link;
+    }
+    private void extractLink()
+    {
         try{
             JSONObject jsonObject = new JSONObject(response);
             link = jsonObject.getJSONObject("data").getString("link").replace("\\", "");
         }catch(Exception e){e.printStackTrace();}
-
-        return link;
     }
     private void execute()
     {

@@ -14,21 +14,19 @@ public class ApiConnection {
     private String query;
     private String response = "";
 
-    public ApiConnection(){}
+    public ApiConnection() {
+    }
 
-    public void setQuery(String query)
-    {
+    public void setQuery(String query) {
         this.query = query;
     }
 
-    public String getResponse()
-    {
+    public String getResponse() {
         execute();
         return response;
     }
 
-    private void execute()
-    {
+    private void execute() {
         HttpsURLConnection httpsURLConnection;
         BufferedReader reader;
         InputStream inputStream;
@@ -42,10 +40,9 @@ public class ApiConnection {
             inputStream = httpsURLConnection.getInputStream();
             reader = new BufferedReader(new InputStreamReader(inputStream));
 
-            while(true)
-            {
+            while (true) {
                 String line = reader.readLine();
-                if(line != null)
+                if (line != null)
                     response += line;
                 else
                     break;
@@ -54,8 +51,9 @@ public class ApiConnection {
             httpsURLConnection.disconnect();
             reader.close();
 
-        }catch(Exception e){e.printStackTrace();}
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
     }
-
 }

@@ -42,5 +42,6 @@ public class Main {
         htmlGenerator.setWikipediaSummary(wikipediaFetcher.getSummary());
         htmlGenerator.generate();
         System.out.print(htmlGenerator.getHtml());
+
     }
 }

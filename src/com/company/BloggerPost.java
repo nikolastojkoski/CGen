@@ -1,5 +1,9 @@
 package com.company;
 
+import org.json.JSONObject;
+import org.mortbay.util.ajax.JSON;
+
+import javax.net.ssl.HttpsURLConnection;
 import java.io.*;
 import java.net.*;
 
@@ -9,16 +13,16 @@ import java.net.*;
 public class BloggerPost {
 
     private String ACCESS_TOKEN;
-    private String API_KEY;
     private String blogID;
     private String title;
     private String content;
-    private String base = "https://www.googleapis.com/blogger/v3/blogs/7459603265214871506/posts?isDraft=true";
-
-    public BloggerPost(String accessToken, String apiKey)
+    private String base = "https://www.googleapis.com/blogger/v3/blogs/";
+    private String extraParameters = "";
+    private String response;
+    private String postUrl;
+    public BloggerPost(String accessToken)
     {
         ACCESS_TOKEN = accessToken;
-        API_KEY = apiKey;
     }
     public void setBlogId(String blogID)
     {
@@ -32,35 +36,73 @@ public class BloggerPost {
     {
         this.content = content;
     }
+    public void addParameters(String param)
+    {
+        extraParameters = param;
+    }
+    public String getPostUrl()
+    {
+        extractPostUrl();
+        return postUrl;
+    }
     public void upload()
     {
+        String data = createDataString();
+
+        HttpsURLConnection connection;
+        OutputStreamWriter writer;
+        BufferedReader reader;
         try {
-            System.out.println("sending req");
-            URI uri = new URI(base);
-            String host = "www.googleapis.com";
-            String path = "/blogger/v3/blogs/" + blogID + "/posts?isDraft=true&access_token=" + ACCESS_TOKEN;
-            int port = 443;
+            String request = base + blogID + "/posts";
+            if(extraParameters.length() > 1)
+                request += "?" + extraParameters;
 
-            Socket socket = new Socket(host, port);
-            PrintWriter request = new PrintWriter(socket.getOutputStream());
-            request.print("POST " + path + " HTTP/1.1\r\n" +
-                          "Host: " + host + "\r\n" +
-                          "Content-type: application/json\r\n\r\n" +
-                          "{\n" +
-                    " \"title\": \"asdasdasd\",\n" +
-                    " \"content\": \"assda\"\n" +
-                    "}");
-            request.flush();
+            URL url = new URL(request);
 
-            InputStream inStream = socket.getInputStream( );
-            BufferedReader rd = new BufferedReader(
-                    new InputStreamReader(inStream));
-            String line;
-            while ((line = rd.readLine()) != null) {
-                System.out.println(line);
+            connection = (HttpsURLConnection) url.openConnection();
+            connection.setRequestProperty("Authorization", " Bearer " + ACCESS_TOKEN);
+            connection.addRequestProperty("Content-type", "application/json");
+            connection.setRequestMethod("POST");
+            connection.setDoInput(true);
+            connection.setDoOutput(true);
+            connection.connect();
+
+            writer = new OutputStreamWriter(connection.getOutputStream());
+            writer.write(data);
+            writer.flush();
+
+            reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+
+            response = "";
+            while(true)
+            {
+                String line = reader.readLine();
+                if(line != null)
+                    response += line;
+                else
+                    break;
             }
 
         } catch (Exception e) { e.printStackTrace(); }
+    }
+    private String createDataString()
+    {
+        String data = "";
+        try{
+            JSONObject object = new JSONObject();
+            object.append("title", title);
+            object.append("content", content);
+            data = object.toString();
+        }catch(Exception e){e.printStackTrace();}
+
+        return data;
+    }
+    private void extractPostUrl()
+    {
+        try{
+            JSONObject object = new JSONObject(response);
+            postUrl = object.getString("url");
+        }catch(Exception e){e.printStackTrace();}
     }
 
 }

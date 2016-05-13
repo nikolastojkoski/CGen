@@ -41,7 +41,19 @@ public class Main {
         htmlGenerator.setYoutubeID(youtubeSearch.getFirstResultID());
         htmlGenerator.setWikipediaSummary(wikipediaFetcher.getSummary());
         htmlGenerator.generate();
-        System.out.print(htmlGenerator.getHtml());
+        System.out.println(htmlGenerator.getHtml());
 
+        ApiAuthenticator authenticator = new ApiAuthenticator();
+        authenticator.setRefreshToken(" < REFRESH TOKEN > ");
+        authenticator.setClientID(" < CLIENT ID >");
+        authenticator.setClientSecret(" < CLIENT SECRET > ");
+        authenticator.execute();
+
+        BloggerPost post = new BloggerPost(authenticator.getAccessToken());
+        post.setBlogId("7459603265214871506");
+        post.setContent(htmlGenerator.getHtml());
+        post.setTitle("Test Post");
+        post.upload();
+        System.out.println(post.getPostUrl());
     }
 }

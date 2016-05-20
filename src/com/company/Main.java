@@ -55,5 +55,13 @@ public class Main {
         post.setTitle("Test Post");
         post.upload();
         System.out.println(post.getPostUrl());
+  
+        VideoGenerator videoGenerator = new VideoGenerator();
+        String[] imageNames = {"resources/MainTemplate.jpg","resources/TestPic.jpg","resources/MainTemplate.jpg","resources/TestPic.jpg"};
+        videoGenerator.setInputImages(imageNames);
+        videoGenerator.setOutputFileName("test_output/testVideo.mp4");
+        videoGenerator.setSize(1280,720);
+        videoGenerator.generate();
+
     }
 }

@@ -1,16 +1,10 @@
 package com.company;
 
+import org.jcodec.api.awt.SequenceEncoder;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
-
+import java.io.IOException;
 import javax.imageio.ImageIO;
-
-import com.xuggle.mediatool.IMediaWriter;
-import com.xuggle.mediatool.ToolFactory;
-import com.xuggle.xuggler.ICodec;
 
 /**
  * Created by Nikola on 5/16/2016.
@@ -19,12 +13,10 @@ public class VideoGenerator {
 
     private String[] inputImageNameDirs;
     private String outputFileName = "myVideo.mp4";
+    private BufferedImage[] images;
     private int width;
     private int height;
     private double FRAME_RATE = 20;
-    private int RUNTIME = 20;
-
-    private static Map<String, File> imageMap = new HashMap<String, File>();
 
     public VideoGenerator(){}
     public void setInputImages(String[] inputImageNames)
@@ -44,40 +36,31 @@ public class VideoGenerator {
     {
         FRAME_RATE = frameRate;
     }
-    public void setRuntime(int runtime)
+    public void generate()
     {
-        RUNTIME = runtime;
-    }
-    public void convert()
-    {
-        IMediaWriter writer = ToolFactory.makeWriter(outputFileName);
-        writer.addVideoStream(0, 0, ICodec.ID.CODEC_ID_MPEG4, width/2, height/2);
+        getImages();
+        try {
+            File file = new File(outputFileName);
+            SequenceEncoder encoder = new SequenceEncoder(file);
+            for(int i=0;i<images.length;i++)
+            {
+                BufferedImage image = images[i];
+                for(int j=0;j<144;j++)
+                    encoder.encodeImage(image);
+            }
+            encoder.finish();
+        } catch (IOException e) {e.printStackTrace();}
 
+    }
+    private void getImages()
+    {
+        images = new BufferedImage[inputImageNameDirs.length];
         for(int i=0;i<inputImageNameDirs.length;i++)
         {
-            String imageName = inputImageNameDirs[i];
             try{
-                BufferedImage currentImage = convertToType(ImageIO.read(new File(imageName)), BufferedImage.TYPE_3BYTE_BGR);
-                writer.encodeVideo(0, currentImage, 300*i, TimeUnit.MILLISECONDS);
-            }catch(Exception e){e.printStackTrace();}
+                images[i] = ImageIO.read(new File(inputImageNameDirs[i]));
+                images[i] = ImageUtils.resize(images[i], width, height);
+            }catch(Exception e){}
         }
-        writer.close();
-        System.out.println("Video Created!");
-
     }
-
-    private BufferedImage convertToType(BufferedImage sourceImage, int targetType)
-    {
-        BufferedImage image;
-        if (sourceImage.getType() == targetType)
-            image = sourceImage;
-        else
-        {
-            image = new BufferedImage(sourceImage.getWidth(), sourceImage.getHeight(), targetType);
-            image.getGraphics().drawImage(sourceImage, 0, 0, null);
-        }
-        return image;
-    }
-
-
 }

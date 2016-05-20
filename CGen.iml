@@ -22,6 +22,7 @@
     <orderEntry type="library" name="java-json" level="project" />
     <orderEntry type="library" name="jsoup-1.9.1" level="project" />
     <orderEntry type="library" name="libs" level="project" />
-    <orderEntry type="library" name="xuggle-xuggler-noarch-5.4" level="project" />
+    <orderEntry type="library" name="jcodec-0.1.9" level="project" />
+    <orderEntry type="library" name="jcodec-javase-0.1.9" level="project" />
   </component>
 </module>

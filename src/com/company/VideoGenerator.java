@@ -15,12 +15,8 @@ public class VideoGenerator {
     private int width;
     private int height;
     private double FRAME_RATE = 0.16;
-    private String projectLocation;
 
-    public VideoGenerator(String projectLocation)
-    {
-        this.projectLocation = projectLocation;
-    }
+    public VideoGenerator(){}
     public void setInputImages(String[] inputImageNames)
     {
         this.inputImageNameDirs = inputImageNames;
@@ -48,20 +44,19 @@ public class VideoGenerator {
         getImages();
         eraseOutputFile();
 
-        String[] commands = new String[2];
-        commands[0] = "cd " + projectLocation;
-        commands[1] = "ffmpeg -i " + inputSound +
+        String command = "ffmpeg -i " + inputSound +
                       " -framerate " + FRAME_RATE +
                       " -i videoGen/frame%d.jpg" +
                       " -c:v libx264 -vf fps=25 -pix_fmt yuv420p -c:a copy -shortest " +
                       outputFileName;
 
-        //TODO: Execute in CMD
+        try {
+            Process r = Runtime.getRuntime().exec("cmd /c start cmd.exe /K \"" + command + " && exit && echo end\"");
+        }catch(Exception e){e.printStackTrace();}
 
     }
     private void getImages()
     {
-        System.out.println("inputSize: " + inputImageNameDirs.length);
         BufferedImage current;
         for(int i=0;i<inputImageNameDirs.length;i++)
         {
@@ -69,7 +64,8 @@ public class VideoGenerator {
                 current = ImageIO.read(new File(inputImageNameDirs[i]));
                 current = ImageUtils.resize(current, width, height);
                 ImageUtils.saveImage(current, "videoGen/frame"+i+".jpg");
-                System.out.println("videoGen/frame"+i+".jpg");
+                if(i == inputImageNameDirs.length - 1)
+                    ImageUtils.saveImage(current, "videoGen/frame"+(i+1)+".jpg");
             }catch(Exception e){e.printStackTrace();}
         }
     }

@@ -24,5 +24,7 @@
     <orderEntry type="library" name="libs" level="project" />
     <orderEntry type="library" name="jcodec-0.1.9" level="project" />
     <orderEntry type="library" name="jcodec-javase-0.1.9" level="project" />
+    <orderEntry type="library" name="javacv" level="project" />
+    <orderEntry type="library" name="javacpp-0.5" level="project" />
   </component>
 </module>

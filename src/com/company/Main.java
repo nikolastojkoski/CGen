@@ -1,5 +1,7 @@
 package com.company;
 
+import java.net.URL;
+
 public class Main {
 
     public static void main(String[] args)
@@ -55,13 +57,19 @@ public class Main {
         post.setTitle("Test Post");
         post.upload();
         System.out.println(post.getPostUrl());
-  
-        VideoGenerator videoGenerator = new VideoGenerator();
-        String[] imageNames = {"resources/MainTemplate.jpg","resources/TestPic.jpg","resources/MainTemplate.jpg","resources/TestPic.jpg"};
+
+        URL location = Main.class.getProtectionDomain().getCodeSource().getLocation();
+        String projectLoc = location.getFile().substring(1);
+        projectLoc = projectLoc.substring(0, projectLoc.indexOf("/out"));
+        System.out.println(projectLoc);
+
+        VideoGenerator videoGenerator = new VideoGenerator(projectLoc);
+        //String[] imageNames = {"resources/MainTemplate.jpg","resources/TestPic.jpg","resources/MainTemplate.jpg","resources/TestPic.jpg"};
+        String[] imageNames = {"resources/sc1.jpg","resources/sc2.jpg","resources/sc3.jpg","resources/sc4.jpg"};
         videoGenerator.setInputImages(imageNames);
-        videoGenerator.setOutputFileName("test_output/testVideo.mp4");
+        videoGenerator.setInputSound("resources/sound.mp3");
+        videoGenerator.setOutputFileName("test_output/testVideo.avi");
         videoGenerator.setSize(1280,720);
         videoGenerator.generate();
-
     }
 }

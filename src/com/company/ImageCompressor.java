@@ -73,5 +73,4 @@ public class ImageCompressor {
         dir.mkdir();
     }
 
-
 }

@@ -1,7 +1,10 @@
 package com.company;
 
+import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 
 /**
  * Created by Nikola on 5/20/2016.
@@ -18,10 +21,14 @@ public class ImageUtils {
 
         return resizedImage;
     }
-
-
-
-
+    public static void saveImage(BufferedImage img, String namepath)
+    {
+        try {
+            ImageIO.write(img, "JPEG", new File(namepath));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
 
 }

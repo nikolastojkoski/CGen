@@ -1,9 +1,7 @@
 package com.company;
 
-import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.IOException;
 
 /**
  * Created by Nikola on 5/2/2016.
@@ -44,20 +42,13 @@ public class ScreenshotGenerator
 
                 /** Save */
                 makeDirectory(outputDirectoryName);
-                saveImage(img, outputDirectoryName + "/" + fileName.substring(0, fileName.indexOf(".")) + "_screenshot.jpg");
+                ImageUtils.saveImage(img, outputDirectoryName + "/" + fileName.substring(0, fileName.indexOf(".")) + "_screenshot.jpg");
             }
 
         }
 
     }
-    private void saveImage(BufferedImage img, String namepath)
-    {
-        try {
-            ImageIO.write(img, "JPEG", new File(namepath));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+
     private void makeDirectory(String directoryName)
     {
         File dir = new File(directoryName);

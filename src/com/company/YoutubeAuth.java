@@ -30,7 +30,7 @@ public class YoutubeAuth {
 
     private static final String CREDENTIALS_DIRECTORY = ".oauth-credentials";
 
-    public static Credential authorize(List<String> scopes, String credentialDatastore) throws IOException
+    public static Credential authorize(List<String> scopes, String credentialDatastore, String userAccount) throws IOException
     {
 
         Reader clientSecretReader = new InputStreamReader(YoutubeAuth.class.getResourceAsStream("/client_secrets.json"));
@@ -49,8 +49,7 @@ public class YoutubeAuth {
         final java.util.logging.Logger buggyLogger = java.util.logging.Logger.getLogger(FileDataStoreFactory.class.getName());
         buggyLogger.setLevel(java.util.logging.Level.SEVERE);
 
-        //TODO: Different dirrectories for different accounts
-        FileDataStoreFactory fileDataStoreFactory = new FileDataStoreFactory(new File(System.getProperty("user.home") + "/" + CREDENTIALS_DIRECTORY));
+        FileDataStoreFactory fileDataStoreFactory = new FileDataStoreFactory(new File(System.getProperty("user.home") + "/.oauth-credentials/" + userAccount));
         DataStore<StoredCredential> datastore = fileDataStoreFactory.getDataStore(credentialDatastore);
 
 
@@ -58,8 +57,7 @@ public class YoutubeAuth {
                 HTTP_TRANSPORT, JSON_FACTORY, clientSecrets, scopes).setCredentialDataStore(datastore)
                 .build();
 
-        // Build the local server and bind it to port 8080
-        LocalServerReceiver localReceiver = new LocalServerReceiver.Builder().setPort(8080).build();
+        LocalServerReceiver localReceiver = new LocalServerReceiver.Builder().setPort(-1).build();
 
         // Authorize.
         return new AuthorizationCodeInstalledApp(flow, localReceiver).authorize("user");

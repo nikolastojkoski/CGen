@@ -11,10 +11,12 @@ import com.google.api.services.youtube.model.VideoSnippet;
 import com.google.api.services.youtube.model.VideoStatus;
 import com.google.common.collect.Lists;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.List;
+import org.json.JSONObject;
 
 /**
  * Created by Nikola on 5/29/2016.
@@ -27,29 +29,38 @@ public class YoutubeUploader {
     private String videoTitle;
     private String videoDescription;
     private List<String> videoTags;
+    private String userAccount;
+    private String CLIENT_ID;
+    private String CLIENT_SECRET;
 
-    public void setInputVideo(String inputVideo)
-    {
+    public YoutubeUploader(String userAccount, String clientId, String clientSecret) {
+        this.userAccount = userAccount;
+        this.CLIENT_ID = clientId;
+        this.CLIENT_SECRET = clientSecret;
+    }
+
+    public void setInputVideo(String inputVideo) {
         VIDEO_FILENAME = inputVideo;
     }
-    public void setVideoTitle(String title)
-    {
+
+    public void setVideoTitle(String title) {
         this.videoTitle = title;
     }
-    public void setVideoDescription(String description)
-    {
+
+    public void setVideoDescription(String description) {
         this.videoDescription = description;
     }
-    public void setVideoTags(List<String>tags)
-    {
+
+    public void setVideoTags(List<String> tags) {
         this.videoTags = tags;
     }
-    public void upload()
-    {
+
+    public void upload() {
         List<String> scopes = Lists.newArrayList("https://www.googleapis.com/auth/youtube.upload");
+        updateClientSecrets();
 
         try {
-            Credential credential = YoutubeAuth.authorize(scopes, "uploadvideo");
+            Credential credential = YoutubeAuth.authorize(scopes, "uploadvideo", userAccount);
 
             youtube = new YouTube.Builder(YoutubeAuth.HTTP_TRANSPORT, YoutubeAuth.JSON_FACTORY, credential).setApplicationName(
                     "youtube-cmdline-uploadvideo-sample").build();
@@ -118,7 +129,24 @@ public class YoutubeUploader {
             System.err.println("Throwable: " + t.getMessage());
             t.printStackTrace();
         }
+
     }
 
+    private void updateClientSecrets() {
+        try {
+            String text = new String(Files.readAllBytes(Paths.get("resources/client_secrets.json")), StandardCharsets.UTF_8);
+            JSONObject object = new JSONObject(text);
+            object.getJSONObject("installed").put("client_id", CLIENT_ID);
+            object.getJSONObject("installed").put("client_secret", CLIENT_SECRET);
+
+            FileWriter writer = new FileWriter("resources/client_secrets.json");
+            writer.write(object.toString());
+            writer.flush();
+            writer.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
 
 }

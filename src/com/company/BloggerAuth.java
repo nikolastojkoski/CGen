@@ -7,14 +7,14 @@ import com.google.api.client.json.jackson.JacksonFactory;
 /**
  * Created by Nikola on 5/10/2016.
  */
-public class ApiAuthenticator {
+public class BloggerAuth {
 
     private String REFRESH_TOKEN;
     private String CLIENT_ID;
     private String CLIENT_SECRET;
     private String ACCESS_TOKEN;
 
-    public ApiAuthenticator(){}
+    public BloggerAuth(){}
     public void setRefreshToken(String refreshToken)
     {
         REFRESH_TOKEN = refreshToken;

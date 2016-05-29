@@ -26,5 +26,7 @@
     <orderEntry type="library" name="jcodec-javase-0.1.9" level="project" />
     <orderEntry type="library" name="javacv" level="project" />
     <orderEntry type="library" name="javacpp-0.5" level="project" />
+    <orderEntry type="library" name="javax.servlet-3.0" level="project" />
+    <orderEntry type="library" name="youtubeLib" level="project" />
   </component>
 </module>

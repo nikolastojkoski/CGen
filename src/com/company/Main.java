@@ -1,10 +1,12 @@
 package com.company;
 
+import java.util.*;
+
 public class Main {
 
     public static void main(String[] args)
     {
- 
+
         String inputDirectoryName = "input_pictures";
         String outputDirectoryName = "output_screenshots";
         String templateNamePath = "resources/MainTemplate.jpg";
@@ -63,6 +65,16 @@ public class Main {
         videoGenerator.setOutputFileName("test_output/testVideo.avi");
         videoGenerator.setSize(1280,720);
         videoGenerator.generate();
+
+        //TODO: edit resources/client_secrets.json with new keys
+
+        List<String> tags = Arrays.asList("helloo","my","nigga");
+        YoutubeUploader uploader = new YoutubeUploader();
+        uploader.setInputVideo("test_output/testVideo.avi");
+        uploader.setVideoTitle("Test Video Title 123");
+        uploader.setVideoDescription("test description asd");
+        uploader.setVideoTags(tags);
+        uploader.upload();
 
     }
 }

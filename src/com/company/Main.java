@@ -3,6 +3,7 @@ package com.company;
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.common.collect.Lists;
 
+import java.net.URLEncoder;
 import java.util.Arrays;
 import java.util.List;
 
@@ -13,8 +14,7 @@ public class Main {
         final int UPLOAD_LIMIT = 5;
         final String inputDirectory = "input_pictures";
         final String outputDirectory = "output";
-        final String downloadLinkBase = "http://adtrack123.pl/go.php?a_aid=56ce33fd8d518&fn=";
-
+        final String downloadLinkBase = "http://adtrack123.pl/go.php?a_aid=56ce33fd8d518&&fn=";
         final String screenshotTemplate = "resources/MainTemplate.jpg";
         final String HowToInstallScreen = "resources/HowToInstall.jpg";
         final String WebsiteLogoScreen = "resources/WebsiteLogo.jpg";
@@ -38,7 +38,6 @@ public class Main {
         BitlyShortener bitlyShortener = new BitlyShortener(BITLY_ACCOUNT, BITLY_API_KEY);
         HtmlGenerator htmlGenerator = new HtmlGenerator();
         VideoGenerator videoGenerator = new VideoGenerator();
-        BloggerAuth bloggerAuth = new BloggerAuth();
 
         boolean noFreeAccounts = false;
         while(assetManager.next())
@@ -87,9 +86,11 @@ public class Main {
             wikipediaFetcher.fetchSummary(googleSearch.getFirstResultLink());
             System.out.println("Wikipedia Summary: " + wikipediaFetcher.getSummary());
 
-            System.out.println(downloadLinkBase + gameTitleQuery + "+Setup");
-            bitlyShortener.shorten(downloadLinkBase + gameTitleQuery + "+Setup");
-            System.out.println("Bitly short URL: " + bitlyShortener.getShortUrl());
+            try {
+                bitlyShortener.shorten(URLEncoder.encode(downloadLinkBase + gameTitleQuery + "+Setup", "UTF-8"));
+                System.out.println("Bitly short URL: " + bitlyShortener.getShortUrl());
+            }catch (Exception e){e.printStackTrace();}
+
 
             htmlGenerator.setDownloadLink(bitlyShortener.getShortUrl());
             htmlGenerator.setImageLink(imgurUploader.getImageLink());
@@ -98,40 +99,62 @@ public class Main {
             htmlGenerator.generate();
             htmlGenerator.saveHtmlFile(gameOutputDirectory + "/" + gameName + ".html");
 
-            String bloggerPostUrl = null;
+            System.out.println("Attempting to get Blogger Access Token");
+            String BLOGGER_ACCESS_TOKEN = null;
             List<String> scopes = Lists.newArrayList("https://www.googleapis.com/auth/blogger");
             try {
-                Credential credential = GoogleAuth.authorize(scopes, "uploadPost", "nikolastojkoski3@gmail.com");
-                System.out.println(credential.getAccessToken());
-                //TODO: insert post with blogger builder
-                BloggerPost bloggerPost = new BloggerPost(credential.getAccessToken());
-                bloggerPost.setBlogId(BLOG_ID);
-                bloggerPost.setTitle(gameTitle + " Free Download PC");
-                bloggerPost.setContent(htmlGenerator.getHtml());
-                bloggerPost.upload();
-                bloggerPostUrl = bloggerPost.getPostUrl();
+                Credential bloggerCredential = GoogleAuth.authorize(scopes, "uploadPost", accountManager.getBloggerEmail(),
+                        accountManager.getBloggerClientID(), accountManager.getBloggerClientSecret());
+                try{
+                    bloggerCredential.refreshToken();
+                }catch(Exception e){System.out.println("Unable to refresh Blogger Token, attempting to use old");}
 
+                BLOGGER_ACCESS_TOKEN = bloggerCredential.getAccessToken();
             }catch(Exception e){e.printStackTrace();}
+
+            if(BLOGGER_ACCESS_TOKEN == null)
+            {
+                System.out.println("Unable to get BLOGGER_ACCESS_TOKEN!");
+                break;
+            }
+            System.out.println("Blogger Access Token: " + BLOGGER_ACCESS_TOKEN);
+
+            System.out.println("Attempting to post to Blogger");
+            BloggerPost bloggerPost = new BloggerPost(BLOGGER_ACCESS_TOKEN);
+            bloggerPost.setBlogId(BLOG_ID);
+            bloggerPost.setTitle(gameTitle + " Free Download PC");
+            //bloggerPost.setContent("test Content");
+            bloggerPost.setContent(htmlGenerator.getHtml());
+           // bloggerPost.addParameters("isDraft=true");
+            if(bloggerPost.upload())
+                System.out.println("Blogger Post Upload Success!");
+            else
+            {
+                System.out.println("Error uploading blogger post!");
+                break;
+            }
 
             String screenshotNamePath = Utils.generateScreenshot(screenshotTemplate, gameImage, gameOutputDirectory + "/" + gameName + "ScreenShot.jpg");
 
+            System.out.println("Generating video...");
             String[] videoScreens = {screenshotNamePath, gameImage, HowToInstallScreen, WebsiteLogoScreen};
             videoGenerator.setInputImages(videoScreens);
             videoGenerator.setInputSound(soundFile);
             videoGenerator.setSize(videoWidth, videoHeight);
             videoGenerator.setOutputFileName(gameOutputDirectory + "/" + gameName + ".avi");
             videoGenerator.generate();
-            Utils.sleep(5000);
 
+            System.out.println("Attempting to upload video");
             List<String> tags = Arrays.asList(gameTitle,"free","games","downloads","recent","game","video game","pc","computer",
                     "mac","windows","download","full game","free games pc","free game download");
-            YoutubeUploader uploader = new YoutubeUploader(accountManager.getEmail(),accountManager.getYoutubeClientID(), accountManager.getYoutubeClientSecret());
+            YoutubeUploader uploader = new YoutubeUploader(accountManager.getYoutubeEmail(),accountManager.getYoutubeClientID(), accountManager.getYoutubeClientSecret());
             uploader.setInputVideo(videoGenerator.getOutputFileName());
             uploader.setVideoTitle("How to Download " + gameTitle + " for FREE (PC)");
-            uploader.setVideoDescription("Link to download: " + bloggerPostUrl);
+            uploader.setVideoDescription("Link to download: " + bloggerPost.getPostUrl());
             uploader.setVideoTags(tags);
             uploader.upload();
             accountManager.incrementUploads(1);
+            //TODO: Generate JSON File with youtube information in case of video deletion
 
         }
     }

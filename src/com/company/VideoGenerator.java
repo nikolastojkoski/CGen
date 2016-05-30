@@ -55,7 +55,8 @@ public class VideoGenerator {
                       outputFileName;
 
         try {
-            Process r = Runtime.getRuntime().exec("cmd /c start cmd.exe /K \"" + command + " && exit && echo end\"");
+            Process r = Runtime.getRuntime().exec("cmd /c start /wait cmd.exe /K \"" + command + " && exit && echo end\"");
+            r.waitFor();
         }catch(Exception e){e.printStackTrace();}
 
     }

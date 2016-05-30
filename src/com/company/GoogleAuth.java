@@ -12,11 +12,12 @@ import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.store.DataStore;
 import com.google.api.client.util.store.FileDataStoreFactory;
+import org.json.JSONObject;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Reader;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.List;
 
 /**
@@ -30,8 +31,10 @@ public class GoogleAuth {
 
     private static final String CREDENTIALS_DIRECTORY = ".oauth-credentials";
 
-    public static Credential authorize(List<String> scopes, String credentialDatastore, String userAccount) throws IOException
+    public static Credential authorize(List<String> scopes, String credentialDatastore,
+                                       String emailAccount, String CLIENT_ID, String CLIENT_SECRET) throws IOException
     {
+        updateClientSecrets(CLIENT_ID, CLIENT_SECRET);
 
         Reader clientSecretReader = new InputStreamReader(GoogleAuth.class.getResourceAsStream("/client_secrets.json"));
         GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(JSON_FACTORY, clientSecretReader);
@@ -49,7 +52,8 @@ public class GoogleAuth {
         final java.util.logging.Logger buggyLogger = java.util.logging.Logger.getLogger(FileDataStoreFactory.class.getName());
         buggyLogger.setLevel(java.util.logging.Level.SEVERE);
 
-        FileDataStoreFactory fileDataStoreFactory = new FileDataStoreFactory(new File(System.getProperty("user.home") + "/.oauth-credentials/" + userAccount));
+        FileDataStoreFactory fileDataStoreFactory = new FileDataStoreFactory(new File(System.getProperty("user.home") + "/.oauth-credentials/"
+                                                                                        + credentialDatastore + "/" + emailAccount));
         DataStore<StoredCredential> datastore = fileDataStoreFactory.getDataStore(credentialDatastore);
 
 
@@ -61,6 +65,23 @@ public class GoogleAuth {
 
         // Authorize.
         return new AuthorizationCodeInstalledApp(flow, localReceiver).authorize("user");
+
+    }
+    private static void updateClientSecrets(String CLIENT_ID, String CLIENT_SECRET)
+    {
+        try {
+            String text = new String(Files.readAllBytes(Paths.get("resources/client_secrets.json")), StandardCharsets.UTF_8);
+            JSONObject object = new JSONObject(text);
+            object.getJSONObject("installed").put("client_id", CLIENT_ID);
+            object.getJSONObject("installed").put("client_secret", CLIENT_SECRET);
+
+            FileWriter writer = new FileWriter("resources/client_secrets.json");
+            writer.write(object.toString());
+            writer.flush();
+            writer.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
     }
 }

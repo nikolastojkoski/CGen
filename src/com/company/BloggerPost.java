@@ -45,7 +45,7 @@ public class BloggerPost {
         extractPostUrl();
         return postUrl;
     }
-    public void upload()
+    public boolean upload()
     {
         String data = createDataString();
 
@@ -82,8 +82,11 @@ public class BloggerPost {
                 else
                     break;
             }
-
-        } catch (Exception e) { e.printStackTrace(); }
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
     }
     private String createDataString()
     {
@@ -94,7 +97,6 @@ public class BloggerPost {
             object.append("content", content);
             data = object.toString();
         }catch(Exception e){e.printStackTrace();}
-
         return data;
     }
     private void extractPostUrl()

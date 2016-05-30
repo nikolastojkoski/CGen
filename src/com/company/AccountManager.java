@@ -6,13 +6,13 @@ package com.company;
 public class AccountManager {
 
     String accountListFile;
-    private String email = "gameboss121212@gmail.com";
-    private String youtubeClientID = "779019512534-fbu64jvb2ham12a92ss8n1np1aj1am3h.apps.googleusercontent.com";
-    private String youtubeClientSecret = "CMhPmO2dYTTsI6UwinE5lBO5";
+    private String youtubeEmail = "/";
+    private String youtubeClientID = "/";
+    private String youtubeClientSecret = "/";
 
+    private String bloggerEmail = "/";
     private String bloggerClientID = "/";
     private String bloggerClientSecret = "/";
-    private String bloggerRefreshToken = "/";
     private int uploads = 0;
 
     public AccountManager()
@@ -22,10 +22,11 @@ public class AccountManager {
     }
     public String getBloggerClientSecret() { return bloggerClientSecret;}
     public String getBloggerClientID() {return bloggerClientID; }
-    public String getBloggerRefreshToken() {return bloggerRefreshToken; }
-    public String getEmail()
+    public String getBloggerEmail(){return bloggerEmail;}
+
+    public String getYoutubeEmail()
     {
-        return email;
+        return youtubeEmail;
     }
     public String getYoutubeClientID()
     {
@@ -35,6 +36,7 @@ public class AccountManager {
     {
         return youtubeClientSecret;
     }
+
     public int getUploads()
     {
         return uploads;

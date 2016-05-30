@@ -16,6 +16,8 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
+
+import jdk.nashorn.internal.runtime.ECMAErrors;
 import org.json.JSONObject;
 
 /**
@@ -57,10 +59,9 @@ public class YoutubeUploader {
 
     public void upload() {
         List<String> scopes = Lists.newArrayList("https://www.googleapis.com/auth/youtube.upload");
-        updateClientSecrets();
 
         try {
-            Credential credential = GoogleAuth.authorize(scopes, "uploadvideo", userAccount);
+            Credential credential = GoogleAuth.authorize(scopes, "uploadvideo", userAccount, CLIENT_ID, CLIENT_SECRET);
 
             youtube = new YouTube.Builder(GoogleAuth.HTTP_TRANSPORT, GoogleAuth.JSON_FACTORY, credential).setApplicationName(
                     "youtube-cmdline-uploadvideo-sample").build();
@@ -117,8 +118,10 @@ public class YoutubeUploader {
             Video returnedVideo = videoInsert.execute();
 
             System.out.println("Upload Success, videoID: " + returnedVideo.getId());
+            System.out.println("Link to video: " + "https://www.youtube.com/watch?v=" + returnedVideo.getId());
 
-        } catch (GoogleJsonResponseException e) {
+        }catch(Exception e){e.printStackTrace();} /*catch (GoogleJsonResponseException e) {
+            System.out.println(e.getMessage());
             System.err.println("GoogleJsonResponseException code: " + e.getDetails().getCode() + " : "
                     + e.getDetails().getMessage());
             e.printStackTrace();
@@ -128,24 +131,7 @@ public class YoutubeUploader {
         } catch (Throwable t) {
             System.err.println("Throwable: " + t.getMessage());
             t.printStackTrace();
-        }
-
-    }
-
-    private void updateClientSecrets() {
-        try {
-            String text = new String(Files.readAllBytes(Paths.get("resources/client_secrets.json")), StandardCharsets.UTF_8);
-            JSONObject object = new JSONObject(text);
-            object.getJSONObject("installed").put("client_id", CLIENT_ID);
-            object.getJSONObject("installed").put("client_secret", CLIENT_SECRET);
-
-            FileWriter writer = new FileWriter("resources/client_secrets.json");
-            writer.write(object.toString());
-            writer.flush();
-            writer.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        }*/
 
     }
 

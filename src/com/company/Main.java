@@ -1,5 +1,8 @@
 package com.company;
 
+import com.google.api.client.auth.oauth2.Credential;
+import com.google.common.collect.Lists;
+
 import java.util.Arrays;
 import java.util.List;
 
@@ -7,74 +10,129 @@ public class Main {
 
     public static void main(String[] args)
     {
+        final int UPLOAD_LIMIT = 5;
+        final String inputDirectory = "input_pictures";
+        final String outputDirectory = "output";
+        final String downloadLinkBase = "http://adtrack123.pl/go.php?a_aid=56ce33fd8d518&fn=";
 
-        String inputDirectoryName = "input_pictures";
-        String outputDirectoryName = "output_screenshots";
-        String templateNamePath = "resources/MainTemplate.jpg";
+        final String screenshotTemplate = "resources/MainTemplate.jpg";
+        final String HowToInstallScreen = "resources/HowToInstall.jpg";
+        final String WebsiteLogoScreen = "resources/WebsiteLogo.jpg";
+        final String soundFile = "resources/sound.mp3";
+        final int videoWidth = 1280;
+        final int videoHeight = 720;
 
-        ScreenshotGenerator screenshotGenerator = new ScreenshotGenerator(inputDirectoryName, outputDirectoryName, templateNamePath);
-        screenshotGenerator.execute();
+        final String BLOG_ID = "7459603265214871506";
+        final String IMGUR_API_KEY = "cb98c2f98ad76fa";
+        final String YT_SEARCH_API_KEY = "AIzaSyDrTVLJKtzt9Sm0pba75XmL0u4F1n7zGgg";
+        final String BITLY_ACCOUNT = "ravenmind";
+        final String BITLY_API_KEY = "R_149d89614d124e9d9dd58606f26cb296";
 
-        YoutubeSearch youtubeSearch = new YoutubeSearch("AIzaSyDrTVLJKtzt9Sm0pba75XmL0u4F1n7zGgg");
-        youtubeSearch.searchVideo("far+cry+3+game+trailer");
-        System.out.println(youtubeSearch.getFirstResultID());
+        AssetManager assetManager = new AssetManager(inputDirectory);
+        AccountManager accountManager = new AccountManager();
 
-        BitlyShortener bitlyShortener = new BitlyShortener("ravenmind", "R_149d89614d124e9d9dd58606f26cb296");
-        System.out.println(bitlyShortener.getShortUrl("http://gamedownloads2016.com"));
-
-        ImageCompressor imageCompressor = new ImageCompressor();
-        imageCompressor.compressImage("resources/TestPic.jpg", 100000);
-        imageCompressor.saveImage("test_output", "compressedImage");
-
-        ImgurUploader imgurUploader = new ImgurUploader("cb98c2f98ad76fa");
-        imgurUploader.upload("resources/TestPic.jpg");
-        System.out.println(imgurUploader.getImageLink());
-
+        ImgurUploader imgurUploader = new ImgurUploader(IMGUR_API_KEY);
+        YoutubeSearch youtubeSearch = new YoutubeSearch(YT_SEARCH_API_KEY);
         GoogleSearch googleSearch = new GoogleSearch();
-        googleSearch.search("Need+for+speed+2015+site:wikipedia.org");
-        System.out.println(googleSearch.getFirstResultLink());
-
         WikipediaFetcher wikipediaFetcher = new WikipediaFetcher();
-        wikipediaFetcher.fetchSummary("https://en.wikipedia.org/wiki/Need_for_Speed_(2015_video_game)");
-        System.out.println(wikipediaFetcher.getSummary());
-
+        BitlyShortener bitlyShortener = new BitlyShortener(BITLY_ACCOUNT, BITLY_API_KEY);
         HtmlGenerator htmlGenerator = new HtmlGenerator();
-        htmlGenerator.setDownloadLink("https://google.com");
-        htmlGenerator.setImageLink(imgurUploader.getImageLink());
-        htmlGenerator.setYoutubeID(youtubeSearch.getFirstResultID());
-        htmlGenerator.setWikipediaSummary(wikipediaFetcher.getSummary());
-        htmlGenerator.generate();
-        System.out.println(htmlGenerator.getHtml());
-
-        BloggerAuth authenticator = new BloggerAuth();
-        authenticator.setRefreshToken(" < REFRESH TOKEN > ");
-        authenticator.setClientID(" < CLIENT ID >");
-        authenticator.setClientSecret(" < CLIENT SECRET > ");
-        authenticator.execute();
-
-        BloggerPost post = new BloggerPost(authenticator.getAccessToken());
-        post.setBlogId("7459603265214871506");
-        post.setContent(htmlGenerator.getHtml());
-        post.setTitle("Test Post");
-        post.upload();
-        System.out.println(post.getPostUrl());
-
-
         VideoGenerator videoGenerator = new VideoGenerator();
-        String[] imageNames = {"resources/MainTemplate.jpg","resources/TestPic.jpg","resources/MainTemplate.jpg"};
-        videoGenerator.setInputImages(imageNames);
-        videoGenerator.setInputSound("resources/sound.mp3");
-        videoGenerator.setOutputFileName("test_output/testVideo.avi");
-        videoGenerator.setSize(1280,720);
-        videoGenerator.generate();
+        BloggerAuth bloggerAuth = new BloggerAuth();
 
-        List<String> tags = Arrays.asList("helloo","my","nigga");
-        YoutubeUploader uploader = new YoutubeUploader("myaccount2@gmail.com","<CLIENT ID>", "<CLIENT SECRET>");
-        uploader.setInputVideo("test_output/testVideo.avi");
-        uploader.setVideoTitle("Test Video Title 123");
-        uploader.setVideoDescription("test description asd");
-        uploader.setVideoTags(tags);
-        uploader.upload();
+        boolean noFreeAccounts = false;
+        while(assetManager.next())
+        {
+            while(accountManager.getUploads() >= UPLOAD_LIMIT)
+            {
+                if(accountManager.next() == false)
+                {
+                    noFreeAccounts = true;
+                    break;
+                }
+            }
+            if(noFreeAccounts)
+                break;
 
+            String gameTitle =  assetManager.getGameTitle();
+            String gameTitleQuery = assetManager.getGameTitle().replace(' ', '+');
+            String gameName = assetManager.getGameName();
+            String gameImage = inputDirectory + "/" + assetManager.getImageFile();
+            String gameOutputDirectory = outputDirectory + "/" + gameName;
+
+            System.out.println("gameTitle: " + gameTitle);
+            System.out.println("gameTitleQuery: " + gameTitleQuery);
+            System.out.println("gameName: " + gameName);
+            System.out.println("gameImage: " + gameImage);
+            System.out.println("gameOutputDirectory: " + gameOutputDirectory);
+            System.out.println();
+
+            Utils.makeDirectory(outputDirectory);
+            Utils.makeDirectory(gameOutputDirectory);
+            Utils.saveImage(gameImage, gameOutputDirectory + "/" + gameName + ".jpg");
+
+            System.out.println("Uploading to imgur...");
+            imgurUploader.upload(gameOutputDirectory + "/" + gameName + ".jpg");
+            System.out.println("ImgurLink: " + imgurUploader.getImageLink());
+
+            System.out.println("YoutubeSearch Query: " + gameTitleQuery + "+game+trailer");
+            youtubeSearch.searchVideo(gameTitleQuery + "+game+trailer");
+            System.out.println("YoutubeTrailerID: " + youtubeSearch.getFirstResultID());
+
+            System.out.println("GoogleSearch Query: " + gameTitleQuery + "+game+site:wikipedia.org");
+            googleSearch.search(gameTitleQuery + "+game+site:wikipedia.org");
+            System.out.println("Google FirstResultLink: " + googleSearch.getFirstResultLink());
+
+            System.out.println("Wikipedia Query: " + googleSearch.getFirstResultLink());
+            wikipediaFetcher.fetchSummary(googleSearch.getFirstResultLink());
+            System.out.println("Wikipedia Summary: " + wikipediaFetcher.getSummary());
+
+            System.out.println(downloadLinkBase + gameTitleQuery + "+Setup");
+            bitlyShortener.shorten(downloadLinkBase + gameTitleQuery + "+Setup");
+            System.out.println("Bitly short URL: " + bitlyShortener.getShortUrl());
+
+            htmlGenerator.setDownloadLink(bitlyShortener.getShortUrl());
+            htmlGenerator.setImageLink(imgurUploader.getImageLink());
+            htmlGenerator.setYoutubeID(youtubeSearch.getFirstResultID());
+            htmlGenerator.setWikipediaSummary(wikipediaFetcher.getSummary());
+            htmlGenerator.generate();
+            htmlGenerator.saveHtmlFile(gameOutputDirectory + "/" + gameName + ".html");
+
+            String bloggerPostUrl = null;
+            List<String> scopes = Lists.newArrayList("https://www.googleapis.com/auth/blogger");
+            try {
+                Credential credential = GoogleAuth.authorize(scopes, "uploadPost", "nikolastojkoski3@gmail.com");
+                System.out.println(credential.getAccessToken());
+                //TODO: insert post with blogger builder
+                BloggerPost bloggerPost = new BloggerPost(credential.getAccessToken());
+                bloggerPost.setBlogId(BLOG_ID);
+                bloggerPost.setTitle(gameTitle + " Free Download PC");
+                bloggerPost.setContent(htmlGenerator.getHtml());
+                bloggerPost.upload();
+                bloggerPostUrl = bloggerPost.getPostUrl();
+
+            }catch(Exception e){e.printStackTrace();}
+
+            String screenshotNamePath = Utils.generateScreenshot(screenshotTemplate, gameImage, gameOutputDirectory + "/" + gameName + "ScreenShot.jpg");
+
+            String[] videoScreens = {screenshotNamePath, gameImage, HowToInstallScreen, WebsiteLogoScreen};
+            videoGenerator.setInputImages(videoScreens);
+            videoGenerator.setInputSound(soundFile);
+            videoGenerator.setSize(videoWidth, videoHeight);
+            videoGenerator.setOutputFileName(gameOutputDirectory + "/" + gameName + ".avi");
+            videoGenerator.generate();
+            Utils.sleep(5000);
+
+            List<String> tags = Arrays.asList(gameTitle,"free","games","downloads","recent","game","video game","pc","computer",
+                    "mac","windows","download","full game","free games pc","free game download");
+            YoutubeUploader uploader = new YoutubeUploader(accountManager.getEmail(),accountManager.getYoutubeClientID(), accountManager.getYoutubeClientSecret());
+            uploader.setInputVideo(videoGenerator.getOutputFileName());
+            uploader.setVideoTitle("How to Download " + gameTitle + " for FREE (PC)");
+            uploader.setVideoDescription("Link to download: " + bloggerPostUrl);
+            uploader.setVideoTags(tags);
+            uploader.upload();
+            accountManager.incrementUploads(1);
+
+        }
     }
 }

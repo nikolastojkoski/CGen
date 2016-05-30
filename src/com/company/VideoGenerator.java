@@ -38,6 +38,10 @@ public class VideoGenerator {
     {
         FRAME_RATE = frameRate;
     }
+    public String getOutputFileName()
+    {
+        return outputFileName;
+    }
     public void generate()
     {
         emptyFrameFolder();
@@ -62,10 +66,10 @@ public class VideoGenerator {
         {
             try{
                 current = ImageIO.read(new File(inputImageNameDirs[i]));
-                current = ImageUtils.resize(current, width, height);
-                ImageUtils.saveImage(current, "videoGen/frame"+i+".jpg");
+                current = Utils.resizeImage(current, width, height);
+                Utils.saveImage(current, "videoGen/frame"+i+".jpg");
                 if(i == inputImageNameDirs.length - 1)
-                    ImageUtils.saveImage(current, "videoGen/frame"+(i+1)+".jpg");
+                    Utils.saveImage(current, "videoGen/frame"+(i+1)+".jpg");
             }catch(Exception e){e.printStackTrace();}
         }
     }
@@ -81,10 +85,6 @@ public class VideoGenerator {
     }
     private void eraseOutputFile()
     {
-        File f = new File(outputFileName);
-        if(f.exists())
-        {
-            f.delete();
-        }
+        Utils.eraseFile(outputFileName);
     }
 }

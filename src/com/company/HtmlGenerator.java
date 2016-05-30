@@ -1,5 +1,7 @@
 package com.company;
 
+import java.io.FileWriter;
+
 /**
  * Created by Nikola on 5/9/2016.
  */
@@ -43,10 +45,10 @@ public class HtmlGenerator {
                 "<table align=\"center\" cellpadding=\"0\" cellspacing=\"0\" class=\"tr-caption-container\" style=\"margin-left: auto; margin-right: auto; text-align: center;\"><tbody>\n" +
                 "<tr><td style=\"text-align: center;\"><span style=\"margin-left: auto; margin-right: auto;\"><a href=\"";
         html += downloadLink;
-        html += "\"><img border=\"0\" height=\"71\" src=\"https://2.bp.blogspot.com/-1Xw3qEk7dpA/Vcm0oEIZsII/AAAAAAAAAEw/ftof5O5ZXgk/s200/Download.png\" width=\"200\" /></a></span></td></tr>\n" +
+        html += "\" rel=\"nofollow\"><img border=\"0\" height=\"71\" src=\"https://2.bp.blogspot.com/-1Xw3qEk7dpA/Vcm0oEIZsII/AAAAAAAAAEw/ftof5O5ZXgk/s200/Download.png\" width=\"200\" /></a></span></td></tr>\n" +
                 "<tr><td class=\"tr-caption\" style=\"text-align: center;\"><a href=\"";
         html += downloadLink;
-        html += "\">For Windows XP,Vista,7,8,10</a></td></tr>\n" +
+        html += "\" rel=\"nofollow\">For Windows XP,Vista,7,8,10</a></td></tr>\n" +
                 "</tbody></table>\n" +
                 "<div class=\"separator\" style=\"clear: both; text-align: center;\">\n" +
                 "<br /></div>\n" +
@@ -91,6 +93,16 @@ public class HtmlGenerator {
                 "<div style=\"text-align: center;\">\n" +
                 "<br /></div>\n" +
                 "<br />";
+    }
+    public void saveHtmlFile(String outputNameDir)
+    {
+        try{
+            FileWriter writer = new FileWriter(outputNameDir);
+            writer.write(html);
+            writer.flush();
+            writer.close();
+        }catch(Exception e){e.printStackTrace();}
+
     }
 
 }

@@ -53,7 +53,7 @@ public class WikipediaFetcher {
 
         int lowestIndex = temp.length();
         boolean found = false;
-        String[] consoleVariations = {"playstation", "xbox", "nintendo", " wii"};
+        String[] consoleVariations = {"play station","playstation", "xbox", "nintendo", " wii"," ios ","android"};
         for(String variation: consoleVariations)
         {
             int index = temp.indexOf(variation);

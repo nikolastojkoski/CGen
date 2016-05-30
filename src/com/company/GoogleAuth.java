@@ -22,7 +22,7 @@ import java.util.List;
 /**
  * Created by Nikola on 5/29/2016.
  */
-public class YoutubeAuth {
+public class GoogleAuth {
 
     public static final HttpTransport HTTP_TRANSPORT = new NetHttpTransport();
 
@@ -33,7 +33,7 @@ public class YoutubeAuth {
     public static Credential authorize(List<String> scopes, String credentialDatastore, String userAccount) throws IOException
     {
 
-        Reader clientSecretReader = new InputStreamReader(YoutubeAuth.class.getResourceAsStream("/client_secrets.json"));
+        Reader clientSecretReader = new InputStreamReader(GoogleAuth.class.getResourceAsStream("/client_secrets.json"));
         GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(JSON_FACTORY, clientSecretReader);
 
         if (clientSecrets.getDetails().getClientId().startsWith("Enter")

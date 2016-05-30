@@ -43,7 +43,7 @@ public class ImageBlender
     public void execute()
     {
         loadImages();
-        top = ImageUtils.resize(top, resizeX, resizeY);
+        top = Utils.resizeImage(top, resizeX, resizeY);
 
         blended = new BufferedImage(bottom.getWidth(), bottom.getHeight(),BufferedImage.TYPE_3BYTE_BGR);
         Graphics g = blended.getGraphics();

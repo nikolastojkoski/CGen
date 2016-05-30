@@ -60,9 +60,9 @@ public class YoutubeUploader {
         updateClientSecrets();
 
         try {
-            Credential credential = YoutubeAuth.authorize(scopes, "uploadvideo", userAccount);
+            Credential credential = GoogleAuth.authorize(scopes, "uploadvideo", userAccount);
 
-            youtube = new YouTube.Builder(YoutubeAuth.HTTP_TRANSPORT, YoutubeAuth.JSON_FACTORY, credential).setApplicationName(
+            youtube = new YouTube.Builder(GoogleAuth.HTTP_TRANSPORT, GoogleAuth.JSON_FACTORY, credential).setApplicationName(
                     "youtube-cmdline-uploadvideo-sample").build();
 
             System.out.println("Uploading: " + VIDEO_FILENAME);

@@ -10,7 +10,7 @@ public class BitlyShortener {
     private String login;
     private String apiKey;
     private String longUrl;
-
+    private String shortUrl;
     private String base = "https://api-ssl.bitly.com/v3/shorten?";
 
     public BitlyShortener(String login, String apiKey)
@@ -18,17 +18,17 @@ public class BitlyShortener {
         this.login = login;
         this.apiKey = apiKey;
     }
-    public String getShortUrl(String longUrl)
+    public String getShortUrl()
+    {
+        return shortUrl;
+    }
+    public void shorten(String longUrl)
     {
         this.longUrl = longUrl;
-        return extractShortUrl(getJSONString());
-    }
-    private String getJSONString()
-    {
         String queryAddress = base + "login=" + login + "&apiKey=" + apiKey + "&longUrl=" + longUrl;
         ApiConnection apiConnection = new ApiConnection();
         apiConnection.setQuery(queryAddress);
-        return apiConnection.getResponse();
+        shortUrl = extractShortUrl(apiConnection.getResponse());
     }
     private String extractShortUrl(String jsonString)
     {

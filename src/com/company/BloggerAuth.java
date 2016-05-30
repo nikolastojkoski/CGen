@@ -15,17 +15,11 @@ public class BloggerAuth {
     private String ACCESS_TOKEN;
 
     public BloggerAuth(){}
-    public void setRefreshToken(String refreshToken)
-    {
-        REFRESH_TOKEN = refreshToken;
-    }
-    public void setClientID(String clientId)
+    public void setParams(String clientId, String clientSecret, String refreshToken)
     {
         CLIENT_ID = clientId;
-    }
-    public void setClientSecret(String clientSecret)
-    {
         CLIENT_SECRET = clientSecret;
+        REFRESH_TOKEN = refreshToken;
     }
     public String getAccessToken()
     {

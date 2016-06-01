@@ -81,7 +81,7 @@ public class HtmlGenerator {
                 "<blockquote class=\"tr_bq\" style=\"clear: both; text-align: center;\">\n" +
                 "<div style=\"text-align: justify;\">";
         html += wikipediaSummary;
-        html += "></div>\n" +
+        html += "</div>\n" +
                 "</blockquote>\n" +
                 "<br />\n" +
                 "<table align=\"center\" cellpadding=\"0\" cellspacing=\"0\" class=\"tr-caption-container\" style=\"margin-left: auto; margin-right: auto; text-align: center;\"><tbody>\n" +

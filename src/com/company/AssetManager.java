@@ -8,9 +8,11 @@ public class AssetManager {
 
     private String[] gamePictures;
     private int currentPos = -1;
+    private boolean FORMATTING_OK = true;
     public AssetManager(String directory)
     {
         gamePictures = new File(directory).list();
+        checkFormatting();
     }
     public boolean next()
         {
@@ -23,6 +25,10 @@ public class AssetManager {
         if(currentPos < gamePictures.length)
             return true;
         return false;
+    }
+    public boolean isInputCorrect()
+    {
+        return FORMATTING_OK;
     }
     public String getImageFile()
     {
@@ -58,14 +64,25 @@ public class AssetManager {
                     builder.insert(i+1, " ");
                     i++;
                 }
+                if(first == '-')
+                    builder.setCharAt(first, ' '); //TODO: fix
             }
         }
-        return builder.toString();
 
+        return builder.toString();
     }
     public int remainingAssets()
     {
         return Math.max(0, gamePictures.length - currentPos - 1);
     }
-
+    private void checkFormatting()
+    {
+        for(int i=0;i<gamePictures.length;i++) {
+            if (gamePictures[i].contains(" "))
+            {
+                FORMATTING_OK = false;
+                break;
+            }
+        }
+    }
 }

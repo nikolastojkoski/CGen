@@ -7,7 +7,7 @@ import org.json.JSONObject;
  */
 public class WikipediaFetcher {
 
-    private String characterLimit = "550";
+    private String characterLimit = "400";
     private String base = "https://en.wikipedia.org/w/api.php?format=json&action=query&prop=extracts&explaintext&exchars="+characterLimit+"&titles=";
     private String title;
     private String finalSummary;
@@ -17,6 +17,8 @@ public class WikipediaFetcher {
     {
         this.title = link.substring(link.indexOf("wiki/") + 5);
         finalSummary = extractSummary(getJsonResponse());
+        selectSummary();
+        refine();
         addPCVersion();
     }
     public String getSummary()
@@ -41,6 +43,13 @@ public class WikipediaFetcher {
         ApiConnection connection = new ApiConnection();
         connection.setQuery(base + title);
         return connection.getResponse();
+    }
+    private void selectSummary()
+    {
+        if(finalSummary.contains("\n"))
+            finalSummary = finalSummary.substring(0,finalSummary.indexOf("\n"));
+        else if(finalSummary.contains("\r"))
+            finalSummary = finalSummary.substring(0,finalSummary.indexOf("\r"));
     }
     private void addPCVersion()
     {
@@ -69,6 +78,11 @@ public class WikipediaFetcher {
             finalSummary = new StringBuilder(finalSummary).insert(lowestIndex, "Windows (PC), ").toString();
         }
 
+    }
+    private void refine()
+    {
+        if(!finalSummary.endsWith("."))
+            finalSummary += "...";
     }
 
 }

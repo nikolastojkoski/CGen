@@ -56,7 +56,6 @@ public class GoogleAuth {
                                                                                         + credentialDatastore + "/" + emailAccount));
         DataStore<StoredCredential> datastore = fileDataStoreFactory.getDataStore(credentialDatastore);
 
-
         GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(
                 HTTP_TRANSPORT, JSON_FACTORY, clientSecrets, scopes).setCredentialDataStore(datastore)
                 .build();

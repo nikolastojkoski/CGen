@@ -63,6 +63,16 @@ public class YoutubeUploader {
         try {
             Credential credential = GoogleAuth.authorize(scopes, "uploadvideo", userAccount, CLIENT_ID, CLIENT_SECRET);
 
+            try{
+                credential.refreshToken();
+                System.out.println("Expiration: " + credential.getExpiresInSeconds());
+
+            }catch (Exception e)
+            {
+                System.out.println("in YoutubeUploader: Unable to refresh Token");
+            }
+
+
             youtube = new YouTube.Builder(GoogleAuth.HTTP_TRANSPORT, GoogleAuth.JSON_FACTORY, credential).setApplicationName(
                     "youtube-cmdline-uploadvideo-sample").build();
 

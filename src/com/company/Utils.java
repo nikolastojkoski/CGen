@@ -6,6 +6,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Scanner;
 
 /**
  * Created by Nikola on 5/20/2016.
@@ -78,6 +79,12 @@ public class Utils {
             writer.flush();
             writer.close();
         }catch(Exception e){e.printStackTrace();}
+    }
+    public static String getInput(String question)
+    {
+        Scanner reader = new Scanner(System.in);
+        System.out.println(question + ": ");
+        return reader.next();
     }
 
 }

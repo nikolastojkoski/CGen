@@ -96,13 +96,7 @@ public class HtmlGenerator {
     }
     public void saveHtmlFile(String outputNameDir)
     {
-        try{
-            FileWriter writer = new FileWriter(outputNameDir);
-            writer.write(html);
-            writer.flush();
-            writer.close();
-        }catch(Exception e){e.printStackTrace();}
-
+        Utils.saveFile(outputNameDir, html);
     }
 
 }

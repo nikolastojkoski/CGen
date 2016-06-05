@@ -4,6 +4,7 @@ import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 
 /**
@@ -56,10 +57,26 @@ public class Utils {
         File dir = new File(directoryName);
         dir.mkdir();
     }
+    public static void makeFile(String fileDirName)
+    {
+        File file = new File(fileDirName);
+        try {
+            file.createNewFile();
+        }catch(Exception e){e.printStackTrace();}
+    }
     public static void sleep(int milliseconds)
     {
         try{
             Thread.sleep(milliseconds);
+        }catch(Exception e){e.printStackTrace();}
+    }
+    public static void saveFile(String outputNameDir, String data)
+    {
+        try{
+            FileWriter writer = new FileWriter(outputNameDir);
+            writer.write(data);
+            writer.flush();
+            writer.close();
         }catch(Exception e){e.printStackTrace();}
     }
 

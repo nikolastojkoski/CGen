@@ -11,6 +11,8 @@ public class Main {
 
     public static void main(String[] args)
     {
+        System.out.println("Main/main");
+
         final int UPLOAD_LIMIT = 6;
         final String inputDirectory = "input_pictures";
         final String outputDirectory = "output";
@@ -27,6 +29,7 @@ public class Main {
         final String YT_SEARCH_API_KEY = "AIzaSyDrTVLJKtzt9Sm0pba75XmL0u4F1n7zGgg";
         final String BITLY_ACCOUNT = "ravenmind";
         final String BITLY_API_KEY = "R_149d89614d124e9d9dd58606f26cb296";
+
 
         AssetManager assetManager = new AssetManager(inputDirectory);
         AccountManager accountManager = new AccountManager();
@@ -167,6 +170,8 @@ public class Main {
             uploader.upload();
             accountManager.incrementUploads(1);
             //TODO: Generate JSON File with youtube information in case of video deletion
+
         }
+
     }
 }

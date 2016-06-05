@@ -74,10 +74,8 @@ public class GoogleAuth {
             object.getJSONObject("installed").put("client_id", CLIENT_ID);
             object.getJSONObject("installed").put("client_secret", CLIENT_SECRET);
 
-            FileWriter writer = new FileWriter("resources/client_secrets.json");
-            writer.write(object.toString());
-            writer.flush();
-            writer.close();
+            Utils.saveFile("resources/client_secrets.json", object.toString());
+
         } catch (Exception e) {
             e.printStackTrace();
         }

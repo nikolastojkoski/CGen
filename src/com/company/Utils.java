@@ -6,6 +6,10 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Scanner;
 
 /**
@@ -80,11 +84,27 @@ public class Utils {
             writer.close();
         }catch(Exception e){e.printStackTrace();}
     }
+    public static void copyFile(String source, String sink)
+    {
+        File sourceFile = new File(source);
+        File sinkFile = new File(sink);
+
+        try {
+            Files.copy(sourceFile.toPath(), sinkFile.toPath());
+        }catch(Exception e){e.printStackTrace();}
+
+    }
     public static String getInput(String question)
     {
         Scanner reader = new Scanner(System.in);
         System.out.println(question + ": ");
         return reader.next();
+    }
+    public static String getCurrentDateTime()
+    {
+        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd-HHmmss");
+        Date date = new Date();
+        return dateFormat.format(date);
     }
 
 }

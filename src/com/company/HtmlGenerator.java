@@ -40,7 +40,7 @@ public class HtmlGenerator {
                 "</h2>\n" +
                 "<div style=\"text-align: center;\">\n" +
                 "<span style=\"font-family: &quot;trebuchet ms&quot; , sans-serif; font-size: x-large;\"><b><u>Download the full game for free</u></b></span><br />\n" +
-                "<span style=\"font-family: &quot;trebuchet ms&quot; , sans-serif; font-size: large;\"><b><u>(Extract .rar arcive and run Setup.exe)</u></b></span></div>\n" +
+                "<span style=\"font-family: &quot;trebuchet ms&quot; , sans-serif; font-size: large;\"><b><u>(Extract .rar archive and run Setup.exe)</u></b></span></div>\n" +
                 "<div class=\"\" style=\"clear: both; text-align: center;\">\n" +
                 "<table align=\"center\" cellpadding=\"0\" cellspacing=\"0\" class=\"tr-caption-container\" style=\"margin-left: auto; margin-right: auto; text-align: center;\"><tbody>\n" +
                 "<tr><td style=\"text-align: center;\"><span style=\"margin-left: auto; margin-right: auto;\"><a href=\"";

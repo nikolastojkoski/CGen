@@ -28,5 +28,6 @@
     <orderEntry type="library" name="javacpp-0.5" level="project" />
     <orderEntry type="library" name="javax.servlet-3.0" level="project" />
     <orderEntry type="library" name="youtubeLib" level="project" />
+    <orderEntry type="library" name="apache-commons" level="project" />
   </component>
 </module>

@@ -1,12 +1,16 @@
 package com.company;
 
+import org.json.JSONObject;
+
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -65,9 +69,12 @@ public class Utils {
     public static void makeFile(String fileDirName)
     {
         File file = new File(fileDirName);
-        try {
-            file.createNewFile();
-        }catch(Exception e){e.printStackTrace();}
+        if(!file.exists())
+        {
+            try {
+                file.createNewFile();
+            } catch (Exception e) {e.printStackTrace();}
+        }
     }
     public static void sleep(int milliseconds)
     {
@@ -77,6 +84,7 @@ public class Utils {
     }
     public static void saveFile(String outputNameDir, String data)
     {
+        makeFile(outputNameDir);
         try{
             FileWriter writer = new FileWriter(outputNameDir);
             writer.write(data);
@@ -105,6 +113,33 @@ public class Utils {
         DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd-HHmmss");
         Date date = new Date();
         return dateFormat.format(date);
+    }
+    public static String readFile(String fileNamePath)
+    {
+        try {
+            return new String(Files.readAllBytes(Paths.get(fileNamePath)), StandardCharsets.UTF_8);
+        }catch(Exception e){e.printStackTrace();}
+
+        return "null";
+    }
+    public static JSONObject readJSONFile(String fileNamePath)
+    {
+        try{
+            return new JSONObject(readFile(fileNamePath));
+        }catch(Exception e){e.printStackTrace();}
+
+        return null;
+    }
+    public static JSONObject makeJSONObject(String... params)
+    {
+        JSONObject object = new JSONObject();
+        for(String param: params)
+        {
+            try {
+                object.put(param.substring(0, param.indexOf(".")), param.substring(param.indexOf(".") + 1));
+            }catch(Exception e){e.printStackTrace();}
+        }
+        return object;
     }
 
 }

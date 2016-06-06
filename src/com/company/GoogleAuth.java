@@ -32,13 +32,13 @@ public class GoogleAuth {
     private static final String CREDENTIALS_DIRECTORY = ".oauth-credentials";
 
     public static Credential authorize(List<String> scopes, String credentialDatastore,
-                                       String emailAccount, String CLIENT_ID, String CLIENT_SECRET) throws IOException
+                                       String emailAccount, String CLIENT_ID, String CLIENT_SECRET,
+                                       boolean GET_FROM_REFRESH_TOKEN) throws IOException
     {
         updateClientSecrets(CLIENT_ID, CLIENT_SECRET);
 
         Reader clientSecretReader = new InputStreamReader(GoogleAuth.class.getResourceAsStream("/client_secrets.json"));
         GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(JSON_FACTORY, clientSecretReader);
-
         if (clientSecrets.getDetails().getClientId().startsWith("Enter")
                 || clientSecrets.getDetails().getClientSecret().startsWith("Enter ")) {
             System.out.println(
@@ -56,9 +56,21 @@ public class GoogleAuth {
                                                                                         + credentialDatastore + "/" + emailAccount));
         DataStore<StoredCredential> datastore = fileDataStoreFactory.getDataStore(credentialDatastore);
 
-        GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(
-                HTTP_TRANSPORT, JSON_FACTORY, clientSecrets, scopes).setCredentialDataStore(datastore)
-                .build();
+        GoogleAuthorizationCodeFlow flow = null;
+        if(GET_FROM_REFRESH_TOKEN)
+        {
+            System.out.println("GoogleAuth/ Using Offline Access Type");
+            flow = new GoogleAuthorizationCodeFlow.Builder(
+                    HTTP_TRANSPORT, JSON_FACTORY, clientSecrets, scopes).setCredentialDataStore(datastore).setAccessType("offline")
+                    .build();
+        }
+        else
+        {
+            flow = new GoogleAuthorizationCodeFlow.Builder(
+                    HTTP_TRANSPORT, JSON_FACTORY, clientSecrets, scopes).setCredentialDataStore(datastore)
+                    .build();
+        }
+
 
         LocalServerReceiver localReceiver = new LocalServerReceiver.Builder().setPort(-1).build();
 

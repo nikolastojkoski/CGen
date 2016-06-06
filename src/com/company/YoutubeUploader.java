@@ -1,6 +1,8 @@
 package com.company;
 
+import com.company.Deprecated.BloggerAuth;
 import com.google.api.client.auth.oauth2.Credential;
+import com.google.api.client.auth.oauth2.TokenResponseException;
 import com.google.api.client.googleapis.json.GoogleJsonResponseException;
 import com.google.api.client.googleapis.media.MediaHttpUploader;
 import com.google.api.client.googleapis.media.MediaHttpUploaderProgressListener;
@@ -31,14 +33,19 @@ public class YoutubeUploader {
     private String videoTitle;
     private String videoDescription;
     private List<String> videoTags;
+
     private String userAccount;
     private String CLIENT_ID;
     private String CLIENT_SECRET;
+    private String REFRESH_TOKEN;
+    private boolean GET_FROM_REFRESH_TOKEN;
 
-    public YoutubeUploader(String userAccount, String clientId, String clientSecret) {
+    public YoutubeUploader(String userAccount, String clientId, String clientSecret, String refreshToken, boolean GET_FROM_REFRESH_TOKEN) {
         this.userAccount = userAccount;
         this.CLIENT_ID = clientId;
         this.CLIENT_SECRET = clientSecret;
+        this.REFRESH_TOKEN = refreshToken;
+        this.GET_FROM_REFRESH_TOKEN = GET_FROM_REFRESH_TOKEN;
     }
 
     public void setInputVideo(String inputVideo) {
@@ -61,17 +68,23 @@ public class YoutubeUploader {
         List<String> scopes = Lists.newArrayList("https://www.googleapis.com/auth/youtube.upload");
 
         try {
-            Credential credential = GoogleAuth.authorize(scopes, "uploadvideo", userAccount, CLIENT_ID, CLIENT_SECRET);
-
-            try{
-                credential.refreshToken();
-                System.out.println("Expiration: " + credential.getExpiresInSeconds());
-
-            }catch (Exception e)
+            Credential credential = GoogleAuth.authorize(scopes, "uploadvideo", userAccount, CLIENT_ID, CLIENT_SECRET, GET_FROM_REFRESH_TOKEN);
+            if(credential.getExpiresInSeconds() < 60)
             {
-                System.out.println("in YoutubeUploader: Unable to refresh Token");
-            }
+                try {
+                    credential.setRefreshToken(REFRESH_TOKEN);
+                    credential.refreshToken();
 
+                    System.out.println("BEFORE REFRESH: " + REFRESH_TOKEN);
+                    System.out.println("AFTER REFRESH: " + credential.getRefreshToken());
+
+                    System.out.println("YoutubeUploader/CredentialExpiration: " + credential.getExpiresInSeconds());
+                } catch(Exception e) {
+                    System.out.println("in YoutubeUploader: Unable to refresh Token, expires: " + credential.getExpiresInSeconds());
+                    e.printStackTrace();
+                }
+            }
+            System.out.println("YoutubeUploader/CredentialExpiration: " + credential.getExpiresInSeconds());
 
             youtube = new YouTube.Builder(GoogleAuth.HTTP_TRANSPORT, GoogleAuth.JSON_FACTORY, credential).setApplicationName(
                     "youtube-cmdline-uploadvideo-sample").build();

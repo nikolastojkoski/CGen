@@ -50,7 +50,7 @@ public class Main {
         }
         while(assetManager.next())
         {
-            while(accountManager.getUploads() >= UPLOAD_LIMIT)
+            while((accountManager.getUploads() >= UPLOAD_LIMIT || !accountManager.isAuthenticated()))
             {
                 if(accountManager.next() == false)
                 {
@@ -60,6 +60,8 @@ public class Main {
             }
             if(noFreeAccounts)
                 break;
+
+            System.out.println(accountManager.getYoutubeEmail());
 
             String gameTitle =  assetManager.getGameTitle();
             String gameTitleQuery = assetManager.getGameTitle().replace(' ', '+');
@@ -99,6 +101,7 @@ public class Main {
                 System.out.println("Bitly short URL: " + bitlyShortener.getShortUrl());
             }catch (Exception e){e.printStackTrace();}
 
+            System.out.println();
 
             htmlGenerator.setDownloadLink(bitlyShortener.getShortUrl());
             htmlGenerator.setImageLink(imgurUploader.getImageLink());
@@ -112,10 +115,13 @@ public class Main {
             List<String> scopes = Lists.newArrayList("https://www.googleapis.com/auth/blogger");
             try {
                 Credential bloggerCredential = GoogleAuth.authorize(scopes, "uploadPost", accountManager.getBloggerEmail(),
-                        accountManager.getBloggerClientID(), accountManager.getBloggerClientSecret());
+                        accountManager.getBloggerClientID(), accountManager.getBloggerClientSecret(), !accountManager.isBloggerRefreshed());
+                accountManager.setBloggerRefreshed(true);
+                System.out.println("BLOGGER REFRESH TOKEN: " + bloggerCredential.getRefreshToken());
                 if(bloggerCredential.getExpiresInSeconds() < 100)
                 {
                     try{
+                        bloggerCredential.setRefreshToken(accountManager.getBloggerRefreshToken());
                         bloggerCredential.refreshToken();
                     }catch(Exception e){System.out.println("Unable to refresh Blogger Token, attempting to use old");}
                 }
@@ -137,7 +143,7 @@ public class Main {
             bloggerPost.setTitle(gameTitle + " Free Download PC");
             //bloggerPost.setContent("test Content");
             bloggerPost.setContent(htmlGenerator.getHtml());
-            //bloggerPost.addParameters("isDraft=true");
+            bloggerPost.addParameters("isDraft=true"); //todo:delete
             if(bloggerPost.upload())
                 System.out.println("Blogger Post Upload Success!");
             else
@@ -145,6 +151,8 @@ public class Main {
                 System.out.println("Error uploading blogger post!");
                 break;
             }
+
+            System.out.println();
 
             String screenshotNamePath = Utils.generateScreenshot(screenshotTemplate, gameImage, gameOutputDirectory + "/" + gameName + "ScreenShot.jpg");
             System.out.println("Generating video...");
@@ -155,23 +163,36 @@ public class Main {
             videoGenerator.setOutputFileName(gameOutputDirectory + "/" + gameName + ".avi");
             videoGenerator.generate();
 
-            String expectedGeneratedVideoLocation = "output/DirtRally/DirtRally.avi";
 
+            /***DEBUG***/
+            System.out.println("Client ID: " + accountManager.getYoutubeClientID());
+            System.out.println("Client Secret: " + accountManager.getYoutubeClientSecret());
+            System.out.println("YT Refresh Token: " + accountManager.getYoutubeRefreshToken());
+
+            //todo:fix authentication
             System.out.println("Attempting to upload video");
             List<String> tags = Arrays.asList(gameTitle,"free","games","downloads","recent","game","video game","pc","computer",
                     "mac","windows","download","full game","free games pc","free game download");
-            YoutubeUploader uploader = new YoutubeUploader(accountManager.getYoutubeEmail(),accountManager.getYoutubeClientID(), accountManager.getYoutubeClientSecret());
+            YoutubeUploader uploader = new YoutubeUploader(
+                    accountManager.getYoutubeEmail(),
+                    accountManager.getYoutubeClientID(),
+                    accountManager.getYoutubeClientSecret(),
+                    accountManager.getYoutubeRefreshToken(),
+                    !accountManager.isYoutubeRefreshed()
+            );
+            accountManager.setYoutubeRefreshed(true);
             uploader.setInputVideo(videoGenerator.getOutputFileName());
-            //uploader.setInputVideo(expectedGeneratedVideoLocation);
             uploader.setVideoTitle("How to Download " + gameTitle + " for FREE (PC)");
             uploader.setVideoDescription("Link to download: " + bloggerPost.getPostUrl());
             //uploader.setVideoDescription("Test Description");
             uploader.setVideoTags(tags);
             uploader.upload();
             accountManager.incrementUploads(1);
-            //TODO: Generate JSON File with youtube information in case of video deletion
+
+            Utils.saveFile(gameOutputDirectory + "/youtubeInfo.json",
+                   Utils.makeJSONObject("title." + gameTitle, "description." + bloggerPost.getPostUrl()).toString());
 
         }
-
+        accountManager.flush();
     }
 }

@@ -26,57 +26,66 @@ import java.util.List;
 public class GoogleAuth {
 
     public static final HttpTransport HTTP_TRANSPORT = new NetHttpTransport();
-
     public static final JsonFactory JSON_FACTORY = new JacksonFactory();
 
-    private static final String CREDENTIALS_DIRECTORY = ".oauth-credentials";
-
+    public static Credential authorize_full(List<String> scopes, String credentialDatastore,
+                                    String emailAccount, String CLIENT_ID, String CLIENT_SECRET, boolean FORCE_REFRESH)
+    {
+        Credential credential = null;
+        try {
+            for(int i=0;i<4;i++)
+            {
+                credential = authorize(scopes, credentialDatastore, emailAccount, CLIENT_ID, CLIENT_SECRET, i%2 == 0);
+                if (credential.getExpiresInSeconds() < 50 || FORCE_REFRESH)
+                {
+                    try {
+                        credential.refreshToken();
+                        break;
+                    } catch (Exception e) {}
+                }
+                else
+                {
+                    break;
+                }
+            }
+        } catch (Exception e) {e.printStackTrace();}
+        return credential;
+    }
     public static Credential authorize(List<String> scopes, String credentialDatastore,
                                        String emailAccount, String CLIENT_ID, String CLIENT_SECRET,
-                                       boolean GET_FROM_REFRESH_TOKEN) throws IOException
+                                       boolean OFFLINE_ACCESS) throws IOException
     {
         updateClientSecrets(CLIENT_ID, CLIENT_SECRET);
-
-        Reader clientSecretReader = new InputStreamReader(GoogleAuth.class.getResourceAsStream("/client_secrets.json"));
-        GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(JSON_FACTORY, clientSecretReader);
-        if (clientSecrets.getDetails().getClientId().startsWith("Enter")
-                || clientSecrets.getDetails().getClientSecret().startsWith("Enter ")) {
-            System.out.println(
-                    "Enter Client ID and Secret from https://console.developers.google.com/project/_/apiui/credential "
-                            + "into src/main/resources/client_secrets.json");
-            System.exit(1);
-        }
-
-        // This creates the credentials datastore at ~/.oauth-credentials/${credentialDatastore}
+        final String dataStoreLocation = System.getProperty("user.home") + "/.oauth-credentials/" + credentialDatastore + "/" + emailAccount;
 
         final java.util.logging.Logger buggyLogger = java.util.logging.Logger.getLogger(FileDataStoreFactory.class.getName());
         buggyLogger.setLevel(java.util.logging.Level.SEVERE);
 
-        FileDataStoreFactory fileDataStoreFactory = new FileDataStoreFactory(new File(System.getProperty("user.home") + "/.oauth-credentials/"
-                                                                                        + credentialDatastore + "/" + emailAccount));
+        Reader clientSecretReader = new InputStreamReader(GoogleAuth.class.getResourceAsStream("/client_secrets.json"));
+        GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(JSON_FACTORY, clientSecretReader);
+
+        FileDataStoreFactory fileDataStoreFactory = new FileDataStoreFactory(new File(dataStoreLocation));
         DataStore<StoredCredential> datastore = fileDataStoreFactory.getDataStore(credentialDatastore);
 
         GoogleAuthorizationCodeFlow flow = null;
-        if(GET_FROM_REFRESH_TOKEN)
+        if(OFFLINE_ACCESS)
         {
-            System.out.println("GoogleAuth/ Using Offline Access Type");
+            System.out.println("GoogleAuth/ Offline Access");
             flow = new GoogleAuthorizationCodeFlow.Builder(
                     HTTP_TRANSPORT, JSON_FACTORY, clientSecrets, scopes).setCredentialDataStore(datastore).setAccessType("offline")
                     .build();
         }
         else
         {
+            System.out.println("GoogleAuth/ Online Access");
             flow = new GoogleAuthorizationCodeFlow.Builder(
                     HTTP_TRANSPORT, JSON_FACTORY, clientSecrets, scopes).setCredentialDataStore(datastore)
                     .build();
         }
 
-
         LocalServerReceiver localReceiver = new LocalServerReceiver.Builder().setPort(-1).build();
 
-        // Authorize.
         return new AuthorizationCodeInstalledApp(flow, localReceiver).authorize("user");
-
     }
     private static void updateClientSecrets(String CLIENT_ID, String CLIENT_SECRET)
     {

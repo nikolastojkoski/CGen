@@ -1,8 +1,6 @@
 package com.company;
 
 import org.json.JSONObject;
-import org.mortbay.util.ajax.JSON;
-
 import javax.net.ssl.HttpsURLConnection;
 import java.io.*;
 import java.net.*;

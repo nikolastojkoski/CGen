@@ -52,7 +52,7 @@ public class AccountAuth {
                 String CLIENT_SECRET = Utils.getInput("Client_Secret");
 
                 List<String> scopes = Lists.newArrayList("https://www.googleapis.com/auth/youtube.upload");
-                Credential credential = GoogleAuth.authorize(scopes, "uploadvideo", EMAIL, CLIENT_ID, CLIENT_SECRET, false);
+                Credential credential = GoogleAuth.authorize(scopes, "uploadvideo", EMAIL, CLIENT_ID, CLIENT_SECRET, true);
 
                 obj.put("email", EMAIL);
                 obj.put("clientId", CLIENT_ID);

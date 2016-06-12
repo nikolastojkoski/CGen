@@ -1,9 +1,6 @@
 package com.company;
 
-import com.company.Deprecated.BloggerAuth;
 import com.google.api.client.auth.oauth2.Credential;
-import com.google.api.client.auth.oauth2.TokenResponseException;
-import com.google.api.client.googleapis.json.GoogleJsonResponseException;
 import com.google.api.client.googleapis.media.MediaHttpUploader;
 import com.google.api.client.googleapis.media.MediaHttpUploaderProgressListener;
 import com.google.api.client.http.InputStreamContent;
@@ -11,16 +8,9 @@ import com.google.api.services.youtube.YouTube;
 import com.google.api.services.youtube.model.Video;
 import com.google.api.services.youtube.model.VideoSnippet;
 import com.google.api.services.youtube.model.VideoStatus;
-import com.google.common.collect.Lists;
 
 import java.io.*;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.List;
-
-import jdk.nashorn.internal.runtime.ECMAErrors;
-import org.json.JSONObject;
 
 /**
  * Created by Nikola on 5/29/2016.
@@ -34,58 +24,28 @@ public class YoutubeUploader {
     private String videoDescription;
     private List<String> videoTags;
 
-    private String userAccount;
-    private String CLIENT_ID;
-    private String CLIENT_SECRET;
-    private String REFRESH_TOKEN;
-    private boolean GET_FROM_REFRESH_TOKEN;
+    private Credential credential;
 
-    public YoutubeUploader(String userAccount, String clientId, String clientSecret, String refreshToken, boolean GET_FROM_REFRESH_TOKEN) {
-        this.userAccount = userAccount;
-        this.CLIENT_ID = clientId;
-        this.CLIENT_SECRET = clientSecret;
-        this.REFRESH_TOKEN = refreshToken;
-        this.GET_FROM_REFRESH_TOKEN = GET_FROM_REFRESH_TOKEN;
+    public YoutubeUploader(Credential credential)
+    {
+        this.credential = credential;
     }
 
     public void setInputVideo(String inputVideo) {
         VIDEO_FILENAME = inputVideo;
     }
-
     public void setVideoTitle(String title) {
         this.videoTitle = title;
     }
-
     public void setVideoDescription(String description) {
         this.videoDescription = description;
     }
-
     public void setVideoTags(List<String> tags) {
         this.videoTags = tags;
     }
 
     public void upload() {
-        List<String> scopes = Lists.newArrayList("https://www.googleapis.com/auth/youtube.upload");
-
         try {
-            Credential credential = GoogleAuth.authorize(scopes, "uploadvideo", userAccount, CLIENT_ID, CLIENT_SECRET, GET_FROM_REFRESH_TOKEN);
-            if(credential.getExpiresInSeconds() < 60)
-            {
-                try {
-                    credential.setRefreshToken(REFRESH_TOKEN);
-                    credential.refreshToken();
-
-                    System.out.println("BEFORE REFRESH: " + REFRESH_TOKEN);
-                    System.out.println("AFTER REFRESH: " + credential.getRefreshToken());
-
-                    System.out.println("YoutubeUploader/CredentialExpiration: " + credential.getExpiresInSeconds());
-                } catch(Exception e) {
-                    System.out.println("in YoutubeUploader: Unable to refresh Token, expires: " + credential.getExpiresInSeconds());
-                    e.printStackTrace();
-                }
-            }
-            System.out.println("YoutubeUploader/CredentialExpiration: " + credential.getExpiresInSeconds());
-
             youtube = new YouTube.Builder(GoogleAuth.HTTP_TRANSPORT, GoogleAuth.JSON_FACTORY, credential).setApplicationName(
                     "youtube-cmdline-uploadvideo-sample").build();
 
@@ -143,18 +103,7 @@ public class YoutubeUploader {
             System.out.println("Upload Success, videoID: " + returnedVideo.getId());
             System.out.println("Link to video: " + "https://www.youtube.com/watch?v=" + returnedVideo.getId());
 
-        }catch(Exception e){e.printStackTrace();} /*catch (GoogleJsonResponseException e) {
-            System.out.println(e.getMessage());
-            System.err.println("GoogleJsonResponseException code: " + e.getDetails().getCode() + " : "
-                    + e.getDetails().getMessage());
-            e.printStackTrace();
-        } catch (IOException e) {
-            System.err.println("IOException: " + e.getMessage());
-            e.printStackTrace();
-        } catch (Throwable t) {
-            System.err.println("Throwable: " + t.getMessage());
-            t.printStackTrace();
-        }*/
+        }catch(Exception e){e.printStackTrace();}
 
     }
 

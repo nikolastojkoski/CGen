@@ -30,6 +30,8 @@ public class Main {
         final String BITLY_ACCOUNT = "ravenmind";
         final String BITLY_API_KEY = "R_149d89614d124e9d9dd58606f26cb296";
 
+        final List<String> bloggerScopes = Lists.newArrayList("https://www.googleapis.com/auth/blogger");
+        final List<String> youtubeScopes = Lists.newArrayList("https://www.googleapis.com/auth/youtube.upload");
 
         AssetManager assetManager = new AssetManager(inputDirectory);
         AccountManager accountManager = new AccountManager();
@@ -42,10 +44,13 @@ public class Main {
         HtmlGenerator htmlGenerator = new HtmlGenerator();
         VideoGenerator videoGenerator = new VideoGenerator();
 
+        Credential bloggerCredential = null;
+        boolean BLOGGER_AUTHORIZED = false;
+
         boolean noFreeAccounts = false;
         if(assetManager.isInputCorrect() == false)
         {
-            System.out.println("INCORRECT FORMAT INPUT");
+            System.out.println("INCORRECT INPUT FORMAT");
             return;
         }
         while(assetManager.next())
@@ -110,32 +115,33 @@ public class Main {
             htmlGenerator.generate();
             htmlGenerator.saveHtmlFile(gameOutputDirectory + "/" + gameName + ".html");
 
-            System.out.println("Attempting to get Blogger Access Token");
-            String BLOGGER_ACCESS_TOKEN = null;
-            List<String> scopes = Lists.newArrayList("https://www.googleapis.com/auth/blogger");
-            try {
-                Credential bloggerCredential = GoogleAuth.authorize(scopes, "uploadPost", accountManager.getBloggerEmail(),
-                        accountManager.getBloggerClientID(), accountManager.getBloggerClientSecret(), !accountManager.isBloggerRefreshed());
-                accountManager.setBloggerRefreshed(true);
-                System.out.println("BLOGGER REFRESH TOKEN: " + bloggerCredential.getRefreshToken());
-                if(bloggerCredential.getExpiresInSeconds() < 100)
-                {
-                    try{
-                        bloggerCredential.setRefreshToken(accountManager.getBloggerRefreshToken());
-                        bloggerCredential.refreshToken();
-                    }catch(Exception e){System.out.println("Unable to refresh Blogger Token, attempting to use old");}
-                }
-
-                BLOGGER_ACCESS_TOKEN = bloggerCredential.getAccessToken();
-                System.out.println("Expires in: " + bloggerCredential.getExpiresInSeconds());
-
-            }catch(Exception e){e.printStackTrace();}
-
-            if(BLOGGER_ACCESS_TOKEN == null)
+            /*** AUTHORIZE BLOGGER AND YOUTUBE ****/
+            if(!BLOGGER_AUTHORIZED || bloggerCredential.getExpiresInSeconds() < 50)
             {
-                System.out.println("Unable to get BLOGGER_ACCESS_TOKEN!");
+                System.out.println("Attempting to authorize blogger...");
+                bloggerCredential = GoogleAuth.authorize_full(bloggerScopes, "uploadPost", accountManager.getBloggerEmail(),
+                        accountManager.getBloggerClientID(), accountManager.getBloggerClientSecret(), false);
+                BLOGGER_AUTHORIZED = true;
+            }
+
+            String BLOGGER_ACCESS_TOKEN = bloggerCredential.getAccessToken();
+            if(bloggerCredential.getExpiresInSeconds() < 0)
+            {
+                System.out.println("Unable to authorize blogger account!");
+                System.out.println("Blogger Expiration: " + bloggerCredential.getExpiresInSeconds());
                 break;
             }
+
+            Credential youtubeCredential = GoogleAuth.authorize_full(youtubeScopes, "uploadvideo", accountManager.getYoutubeEmail(),
+                    accountManager.getYoutubeClientID(), accountManager.getYoutubeClientSecret(), false);
+
+            if(youtubeCredential.getExpiresInSeconds() < 0)
+            {
+                System.out.println("Unable to authorize youtube account!");
+                System.out.println("Youtube Expiration: " + bloggerCredential.getExpiresInSeconds());
+                break;
+            }
+            /*********************************************/
 
             System.out.println("Attempting to post to Blogger");
             BloggerPost bloggerPost = new BloggerPost(BLOGGER_ACCESS_TOKEN);
@@ -143,7 +149,7 @@ public class Main {
             bloggerPost.setTitle(gameTitle + " Free Download PC");
             //bloggerPost.setContent("test Content");
             bloggerPost.setContent(htmlGenerator.getHtml());
-            bloggerPost.addParameters("isDraft=true"); //todo:delete
+            //bloggerPost.addParameters("isDraft=true"); //todo:delete
             if(bloggerPost.upload())
                 System.out.println("Blogger Post Upload Success!");
             else
@@ -163,24 +169,11 @@ public class Main {
             videoGenerator.setOutputFileName(gameOutputDirectory + "/" + gameName + ".avi");
             videoGenerator.generate();
 
-
-            /***DEBUG***/
-            System.out.println("Client ID: " + accountManager.getYoutubeClientID());
-            System.out.println("Client Secret: " + accountManager.getYoutubeClientSecret());
-            System.out.println("YT Refresh Token: " + accountManager.getYoutubeRefreshToken());
-
-            //todo:fix authentication
             System.out.println("Attempting to upload video");
             List<String> tags = Arrays.asList(gameTitle,"free","games","downloads","recent","game","video game","pc","computer",
                     "mac","windows","download","full game","free games pc","free game download");
-            YoutubeUploader uploader = new YoutubeUploader(
-                    accountManager.getYoutubeEmail(),
-                    accountManager.getYoutubeClientID(),
-                    accountManager.getYoutubeClientSecret(),
-                    accountManager.getYoutubeRefreshToken(),
-                    !accountManager.isYoutubeRefreshed()
-            );
-            accountManager.setYoutubeRefreshed(true);
+            YoutubeUploader uploader = new YoutubeUploader(youtubeCredential);
+
             uploader.setInputVideo(videoGenerator.getOutputFileName());
             uploader.setVideoTitle("How to Download " + gameTitle + " for FREE (PC)");
             uploader.setVideoDescription("Link to download: " + bloggerPost.getPostUrl());

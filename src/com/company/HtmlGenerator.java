@@ -1,7 +1,5 @@
 package com.company;
 
-import java.io.FileWriter;
-
 /**
  * Created by Nikola on 5/9/2016.
  */

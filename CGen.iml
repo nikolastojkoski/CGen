@@ -29,5 +29,7 @@
     <orderEntry type="library" name="javax.servlet-3.0" level="project" />
     <orderEntry type="library" name="youtubeLib" level="project" />
     <orderEntry type="library" name="apache-commons" level="project" />
+    <orderEntry type="library" name="ads-lib-1.18.1-sources" level="project" />
+    <orderEntry type="library" name="ads-lib-1.17.0" level="project" />
   </component>
 </module>

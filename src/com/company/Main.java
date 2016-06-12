@@ -1,6 +1,7 @@
 package com.company;
 
 import com.google.api.client.auth.oauth2.Credential;
+import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
 import com.google.common.collect.Lists;
 
 import java.net.URLEncoder;
@@ -68,6 +69,57 @@ public class Main {
 
             System.out.println(accountManager.getYoutubeEmail());
 
+            /*** AUTHORIZE BLOGGER AND YOUTUBE ****/
+            if(!BLOGGER_AUTHORIZED || bloggerCredential.getExpiresInSeconds() < 50)
+            {
+                System.out.println("Attempting to authorize blogger...\n");
+
+                bloggerCredential = GoogleAuth.authorize_full(bloggerScopes, "uploadPost", accountManager.getBloggerEmail(),
+                        accountManager.getBloggerClientID(), accountManager.getBloggerClientSecret(), false);
+                BLOGGER_AUTHORIZED = true;
+            }
+
+            String BLOGGER_ACCESS_TOKEN = bloggerCredential.getAccessToken();
+            if(bloggerCredential.getExpiresInSeconds() < 0)
+            {
+                System.out.println("Unable to authorize blogger credential!");
+                accountManager.debugBlogger();
+                System.out.println("Blogger Expiration: " + bloggerCredential.getExpiresInSeconds());
+                break;
+            }
+
+            System.out.println("Attempting to authorize youtube...\n");
+            Credential youtubeCredential = GoogleAuth.authorize_full(youtubeScopes, "uploadvideo", accountManager.getYoutubeEmail(),
+                    accountManager.getYoutubeClientID(), accountManager.getYoutubeClientSecret(), false);
+
+            if(youtubeCredential.getExpiresInSeconds() < 0)
+            {
+                System.out.println("Unable to authorize youtube credential!\n");
+                accountManager.debugYoutube();
+                System.out.println("Youtube Expiration: " + youtubeCredential.getExpiresInSeconds());
+
+                if(Utils.getBooleanInput("Reauthorize account" + accountManager.getYoutubeEmail()))
+                    youtubeCredential = AccountAuth.reAuthorizeAccount(accountManager.getArrayPosition());
+                else
+                    break;
+            }
+            System.out.println("Blogger expires: " + bloggerCredential.getExpiresInSeconds());
+            System.out.println("Youtube expires: " + youtubeCredential.getExpiresInSeconds() + "\n");
+
+            try{
+                youtubeCredential.refreshToken();
+            }catch (Exception e){
+                e.printStackTrace();
+                accountManager.debugYoutube();
+                System.out.println("Unable to refresh youtube credential!");
+
+                if(Utils.getBooleanInput("Reauthorize account" + accountManager.getYoutubeEmail()))
+                    youtubeCredential = AccountAuth.reAuthorizeAccount(accountManager.getArrayPosition());
+                else
+                    break;
+            }
+            /*********************************************/
+
             String gameTitle =  assetManager.getGameTitle();
             String gameTitleQuery = assetManager.getGameTitle().replace(' ', '+');
             String gameName = assetManager.getGameName();
@@ -115,34 +167,6 @@ public class Main {
             htmlGenerator.generate();
             htmlGenerator.saveHtmlFile(gameOutputDirectory + "/" + gameName + ".html");
 
-            /*** AUTHORIZE BLOGGER AND YOUTUBE ****/
-            if(!BLOGGER_AUTHORIZED || bloggerCredential.getExpiresInSeconds() < 50)
-            {
-                System.out.println("Attempting to authorize blogger...");
-                bloggerCredential = GoogleAuth.authorize_full(bloggerScopes, "uploadPost", accountManager.getBloggerEmail(),
-                        accountManager.getBloggerClientID(), accountManager.getBloggerClientSecret(), false);
-                BLOGGER_AUTHORIZED = true;
-            }
-
-            String BLOGGER_ACCESS_TOKEN = bloggerCredential.getAccessToken();
-            if(bloggerCredential.getExpiresInSeconds() < 0)
-            {
-                System.out.println("Unable to authorize blogger account!");
-                System.out.println("Blogger Expiration: " + bloggerCredential.getExpiresInSeconds());
-                break;
-            }
-
-            Credential youtubeCredential = GoogleAuth.authorize_full(youtubeScopes, "uploadvideo", accountManager.getYoutubeEmail(),
-                    accountManager.getYoutubeClientID(), accountManager.getYoutubeClientSecret(), false);
-
-            if(youtubeCredential.getExpiresInSeconds() < 0)
-            {
-                System.out.println("Unable to authorize youtube account!");
-                System.out.println("Youtube Expiration: " + bloggerCredential.getExpiresInSeconds());
-                break;
-            }
-            /*********************************************/
-
             System.out.println("Attempting to post to Blogger");
             BloggerPost bloggerPost = new BloggerPost(BLOGGER_ACCESS_TOKEN);
             bloggerPost.setBlogId(BLOG_ID);
@@ -179,12 +203,19 @@ public class Main {
             uploader.setVideoDescription("Link to download: " + bloggerPost.getPostUrl());
             //uploader.setVideoDescription("Test Description");
             uploader.setVideoTags(tags);
-            uploader.upload();
-            accountManager.incrementUploads(1);
 
-            Utils.saveFile(gameOutputDirectory + "/youtubeInfo.json",
-                   Utils.makeJSONObject("title." + gameTitle, "description." + bloggerPost.getPostUrl()).toString());
+            if(uploader.upload())
+            {
+                accountManager.incrementUploads(1);
 
+                Utils.saveFile(gameOutputDirectory + "/youtubeInfo.json",
+                        Utils.makeJSONObject("title." + gameTitle, "description." + bloggerPost.getPostUrl()).toString());
+            }
+            else
+            {
+                System.out.println("Error uploading video!");
+                break;
+            }
         }
         accountManager.flush();
     }

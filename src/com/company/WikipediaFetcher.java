@@ -75,7 +75,7 @@ public class WikipediaFetcher {
 
         if(found)
         {
-            finalSummary = new StringBuilder(finalSummary).insert(lowestIndex, "Windows (PC), ").toString();
+            finalSummary = new StringBuilder(finalSummary).insert(lowestIndex, " Windows (PC), ").toString();
         }
 
     }

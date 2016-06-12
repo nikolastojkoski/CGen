@@ -53,7 +53,7 @@ public class Utils {
             saveImage(img, outputNamePath);
         }catch(Exception e){e.printStackTrace();}
     }
-    public static void eraseFile(String filename)
+    public static void deleteFile(String filename)
     {
         File f = new File(filename);
         if(f.exists())
@@ -108,6 +108,17 @@ public class Utils {
         System.out.println(question + ": ");
         return reader.next();
     }
+    public static boolean getBooleanInput(String question)
+    {
+        Scanner reader = new Scanner(System.in);
+        System.out.println(question + "?(y/n): ");
+
+        char response = reader.next().charAt(0);
+        if(response == 'n' || response == '0' || response == 'N')
+            return false;
+        else
+            return true;
+    }
     public static String getCurrentDateTime()
     {
         DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd-HHmmss");
@@ -140,6 +151,16 @@ public class Utils {
             }catch(Exception e){e.printStackTrace();}
         }
         return object;
+    }
+    public static void deleteDirectoryContents(String directoryPath)
+    {
+        File dir = new File(directoryPath);
+        String[] contents = dir.list();
+        for(String f: contents)
+        {
+            File currentFile = new File(dir.getPath(), f);
+            currentFile.delete();
+        }
     }
 
 }

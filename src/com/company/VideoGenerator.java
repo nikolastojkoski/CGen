@@ -86,6 +86,6 @@ public class VideoGenerator {
     }
     private void eraseOutputFile()
     {
-        Utils.eraseFile(outputFileName);
+        Utils.deleteFile(outputFileName);
     }
 }

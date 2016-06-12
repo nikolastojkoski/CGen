@@ -33,7 +33,7 @@ public class GoogleAuth {
     {
         Credential credential = null;
         try {
-            for(int i=0;i<4;i++)
+            for(int i=0;i<12;i++)
             {
                 credential = authorize(scopes, credentialDatastore, emailAccount, CLIENT_ID, CLIENT_SECRET, i%2 == 0);
                 if (credential.getExpiresInSeconds() < 50 || FORCE_REFRESH)

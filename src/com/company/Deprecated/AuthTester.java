@@ -15,7 +15,7 @@ public class AuthTester {
     public static void main(String[] args)
     {
         final String api = "youtube";
-        final boolean FORCE_REFRESH = false;
+        final boolean FORCE_REFRESH = true;
 
         String email = Utils.getInput("email");
         String clientID = Utils.getInput("clientId");

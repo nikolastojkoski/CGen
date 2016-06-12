@@ -27,7 +27,7 @@ public class GoogleSearch {
     }
     private void execute()
     {
-        String request = base + query + "&num=1";
+        String request = base + query + "&num=5";
         try{
             Document doc = Jsoup
                     .connect(request)
@@ -38,7 +38,7 @@ public class GoogleSearch {
             for(Element link : links)
             {
                 String temp = link.attr("href");
-                if(temp.startsWith("/url?q="))
+                if(temp.startsWith("/url?q=") && temp.contains("wikipedia"))
                 {
                     firstResultLink = temp.substring(7, temp.indexOf("&"));
                     break;

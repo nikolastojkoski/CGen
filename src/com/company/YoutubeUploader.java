@@ -44,7 +44,7 @@ public class YoutubeUploader {
         this.videoTags = tags;
     }
 
-    public void upload() {
+    public boolean upload() {
         try {
             youtube = new YouTube.Builder(GoogleAuth.HTTP_TRANSPORT, GoogleAuth.JSON_FACTORY, credential).setApplicationName(
                     "youtube-cmdline-uploadvideo-sample").build();
@@ -102,8 +102,13 @@ public class YoutubeUploader {
 
             System.out.println("Upload Success, videoID: " + returnedVideo.getId());
             System.out.println("Link to video: " + "https://www.youtube.com/watch?v=" + returnedVideo.getId());
+            return true;
 
-        }catch(Exception e){e.printStackTrace();}
+        }catch(Exception e)
+        {
+            e.printStackTrace();
+            return false;
+        }
 
     }
 

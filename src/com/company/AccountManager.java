@@ -15,7 +15,7 @@ public class AccountManager {
     private JSONObject youtubeAccounts;
     private JSONArray youtubeAccountsArray;
     private int youtubeAccountsArraySize;
-    private int position = 1;
+    private int position = 0;
 
     private String youtubeEmail;
     private String youtubeClientID;
@@ -80,6 +80,7 @@ public class AccountManager {
     {
         uploads = val;
     }
+    public int getArrayPosition(){return position;}
     public boolean next()
     {
         flush();
@@ -101,6 +102,18 @@ public class AccountManager {
             youtubeAccounts.getJSONArray("accounts").getJSONObject(position).put("uploads", uploads);
             Utils.saveFile(youtubeAccountsFile, youtubeAccounts.toString());
         }catch(Exception e){e.printStackTrace();}
+    }
+    public void debugBlogger()
+    {
+        System.out.println(bloggerEmail);
+        System.out.println(bloggerClientID);
+        System.out.println(bloggerClientSecret + "\n");
+    }
+    public void debugYoutube()
+    {
+        System.out.println(youtubeEmail);
+        System.out.println(youtubeClientID);
+        System.out.println(youtubeClientSecret + "\n");
     }
     private void loadYoutubeSecrets()
     {

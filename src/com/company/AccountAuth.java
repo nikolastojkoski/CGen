@@ -15,13 +15,14 @@ import java.util.List;
  */
 public class AccountAuth {
 
+    static final String accountListFile = "resources/youtubeAccounts.json";
+    static final String backupDirectory = "resources/backups";
+    static final String credentialDatastore = "uploadvideo";
 
     public static void main(String[] args)
     {
         System.out.println("AccountAuth/main");
 
-        final String accountListFile = "resources/youtubeAccounts.json";
-        final String backupDirectory = "resources/backups";
         boolean NEW_CHANGES = false;
 
         Utils.makeFile(accountListFile);
@@ -52,7 +53,7 @@ public class AccountAuth {
                 String CLIENT_SECRET = Utils.getInput("Client_Secret");
 
                 List<String> scopes = Lists.newArrayList("https://www.googleapis.com/auth/youtube.upload");
-                Credential credential = GoogleAuth.authorize(scopes, "uploadvideo", EMAIL, CLIENT_ID, CLIENT_SECRET, true);
+                Credential credential = GoogleAuth.authorize(scopes, credentialDatastore, EMAIL, CLIENT_ID, CLIENT_SECRET, true);
 
                 obj.put("email", EMAIL);
                 obj.put("clientId", CLIENT_ID);
@@ -86,6 +87,40 @@ public class AccountAuth {
             String backupLoc = backupDirectory + "/backup_" + Utils.getCurrentDateTime() + ".json";
             Utils.copyFile(accountListFile, backupLoc);
             Utils.saveFile(accountListFile, object.toString());
+        }
+
+    }
+    public static Credential reAuthorizeAccount(int position)
+    {
+        try {
+            String text = new String(Files.readAllBytes(Paths.get(accountListFile)), StandardCharsets.UTF_8);
+
+            JSONObject object = new JSONObject(text);
+            JSONObject account = object.getJSONArray("accounts").getJSONObject(position);
+
+            String EMAIL = account.getString("email");
+            String CLIENT_ID = account.getString("clientId");
+            String CLIENT_SECRET = account.getString("clientSecret");
+
+            String datastoreLocation = System.getProperty("user.home") + "/.oauth-credentials/" + credentialDatastore + "/" + EMAIL;
+            Utils.deleteDirectoryContents(datastoreLocation);
+            Utils.deleteFile(datastoreLocation);
+
+            List<String> scopes = Lists.newArrayList("https://www.googleapis.com/auth/youtube.upload");
+            Credential credential = GoogleAuth.authorize(scopes, credentialDatastore, EMAIL, CLIENT_ID, CLIENT_SECRET, true);
+
+            account.put("refreshToken", credential.getRefreshToken());
+            object.getJSONArray("accounts").put(position, account);
+
+            String backupLoc = backupDirectory + "/backup_" + Utils.getCurrentDateTime() + ".json";
+            Utils.copyFile(accountListFile, backupLoc);
+            Utils.saveFile(accountListFile, object.toString());
+
+            return credential;
+
+        }catch(Exception e) {
+            e.printStackTrace();
+            return null;
         }
 
     }

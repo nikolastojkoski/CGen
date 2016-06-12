@@ -17,8 +17,7 @@ public class AssetManager {
     public boolean next()
         {
         //if(currentPos >= 0)
-            //TODO: add directory
-            //Utils.eraseFile(gamePictures[currentPos]);
+            //TODO: move pic to /DONE
 
         currentPos++;
 

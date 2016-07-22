@@ -1,7 +1,6 @@
 package com.company;
 
 import com.google.api.client.auth.oauth2.Credential;
-import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
 import com.google.common.collect.Lists;
 
 import java.net.URLEncoder;
@@ -14,7 +13,7 @@ public class Main {
     {
         System.out.println("Main/main");
 
-        final int UPLOAD_LIMIT = 6;
+        final int UPLOAD_LIMIT = 7;
         final String inputDirectory = "input_pictures";
         final String outputDirectory = "output";
         final String downloadLinkBase = "http://adtrack123.pl/go.php?a_aid=56ce33fd8d518&&fn=";
@@ -33,6 +32,8 @@ public class Main {
 
         final List<String> bloggerScopes = Lists.newArrayList("https://www.googleapis.com/auth/blogger");
         final List<String> youtubeScopes = Lists.newArrayList("https://www.googleapis.com/auth/youtube.upload");
+
+        //todo: add boolean ClearBloggerCredentialsDatastore, ClearYoutubeCredentialsDatastore
 
         AssetManager assetManager = new AssetManager(inputDirectory);
         AccountManager accountManager = new AccountManager();
@@ -79,6 +80,7 @@ public class Main {
                 BLOGGER_AUTHORIZED = true;
             }
 
+            //todo: reauthorize blogger
             String BLOGGER_ACCESS_TOKEN = bloggerCredential.getAccessToken();
             if(bloggerCredential.getExpiresInSeconds() < 0)
             {
@@ -88,7 +90,9 @@ public class Main {
                 break;
             }
 
+            //todo: colored bold text with email
             System.out.println("Attempting to authorize youtube...\n");
+            System.out.println("\u001B[35m" + accountManager.getYoutubeEmail() + "\u001B[0m");
             Credential youtubeCredential = GoogleAuth.authorize_full(youtubeScopes, "uploadvideo", accountManager.getYoutubeEmail(),
                     accountManager.getYoutubeClientID(), accountManager.getYoutubeClientSecret(), false);
 
@@ -98,7 +102,7 @@ public class Main {
                 accountManager.debugYoutube();
                 System.out.println("Youtube Expiration: " + youtubeCredential.getExpiresInSeconds());
 
-                if(Utils.getBooleanInput("Reauthorize account" + accountManager.getYoutubeEmail()))
+                if(Utils.getBooleanInput("Reauthorize account " + accountManager.getYoutubeEmail()))
                     youtubeCredential = AccountAuth.reAuthorizeAccount(accountManager.getArrayPosition());
                 else
                     break;
@@ -113,7 +117,7 @@ public class Main {
                 accountManager.debugYoutube();
                 System.out.println("Unable to refresh youtube credential!");
 
-                if(Utils.getBooleanInput("Reauthorize account" + accountManager.getYoutubeEmail()))
+                if(Utils.getBooleanInput("Reauthorize account " + accountManager.getYoutubeEmail()))
                     youtubeCredential = AccountAuth.reAuthorizeAccount(accountManager.getArrayPosition());
                 else
                     break;

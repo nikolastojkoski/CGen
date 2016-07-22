@@ -124,5 +124,10 @@ public class AccountAuth {
         }
 
     }
+    public static Credential reAuthorizeBloggerAccount(String bloggerEmail)
+    {
+        // todo: read and edit blogger client secret file in /resources/
+        return null;
+    }
 
 }

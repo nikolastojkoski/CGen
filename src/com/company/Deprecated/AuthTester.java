@@ -28,6 +28,7 @@ public class AuthTester {
             List<String> scopes = Lists.newArrayList("https://www.googleapis.com/auth/youtube.upload");
             credential = GoogleAuth.authorize_full(scopes, "uploadvideo", email, clientID, clientSecret, FORCE_REFRESH);
             System.out.println(credential.getRefreshToken());
+            System.out.println(credential.getAccessToken());
             System.out.println(credential.getExpiresInSeconds());
         }
         else
